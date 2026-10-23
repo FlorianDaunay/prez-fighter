@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-style: var(--border-style);
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-canvas text-text-primary font-sans;
+    background-image: var(--effect-canvas-image);
+    overflow: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid rgb(var(--color-accent));
+    outline-offset: var(--focus-offset);
+  }
+}
+
+@layer components {
+  .font-arcade {
+    font-family: "Bungee", Impact, sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .surface {
+    @apply bg-surface border border-border;
+    backdrop-filter: var(--effect-surface-backdrop);
+  }
+  .panel {
+    @apply bg-surface/90 border-2 border-border rounded-card shadow-card;
+  }
+  .btn {
+    @apply font-arcade px-5 py-2 rounded-control bg-surface-hover text-text-primary border-2 border-border shadow-control transition-transform;
+  }
+  .btn:active {
+    box-shadow: var(--shadow-inset);
+    transform: translateY(2px);
+  }
+  .btn-primary {
+    @apply bg-accent text-accent-foreground border-accent;
+  }
+  .input {
+    @apply bg-canvas border-2 border-border rounded-control px-3 py-2 text-text-primary font-arcade tracking-widest uppercase;
+  }
+  .kbd {
+    @apply inline-block min-w-[1.8em] px-1.5 py-0.5 rounded-control bg-canvas border border-border text-center font-arcade text-xs text-accent;
+  }
+
+  /* Arcade title with thick outline and tricolor shadow */
+  .logo {
+    font-family: "Bungee", Impact, sans-serif;
+    color: #ffd21a;
+    -webkit-text-stroke: 3px #120a00;
+    text-shadow:
+      5px 5px 0 #d7262e,
+      10px 10px 0 #1d3fa0,
+      12px 14px 18px rgb(0 0 0 / 0.6);
+    line-height: 0.95;
+  }
+  .stroke-text {
+    -webkit-text-stroke: 1.5px #0a0a0a;
+    paint-order: stroke fill;
+  }
+
+  /* Menu entries: skewed bars that light up when selected */
+  .menu-item {
+    @apply relative font-arcade text-lg md:text-xl px-6 py-1.5 text-text-secondary cursor-pointer;
+    transform: skewX(-12deg);
+    background: linear-gradient(90deg, rgb(var(--color-surface) / 0.85), rgb(var(--color-surface) / 0.2));
+    border-left: 6px solid transparent;
+    transition: transform 0.08s, background 0.08s, color 0.08s;
+  }
+  .menu-item > span {
+    display: inline-block;
+    transform: skewX(12deg);
+  }
+  .menu-item.active {
+    @apply text-accent-foreground;
+    background: linear-gradient(90deg, rgb(var(--color-accent)), rgb(var(--color-accent) / 0.35));
+    border-left-color: #d7262e;
+    transform: skewX(-12deg) translateX(14px) scale(1.04);
+  }
+  .menu-item.disabled {
+    opacity: 0.4;
+  }
+
+  .stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(255 255 255 / 0.035) 0 18px,
+      transparent 18px 36px
+    );
+    animation: stripes 2.5s linear infinite;
+  }
+  .tile {
+    @apply relative rounded-tile overflow-hidden border-2 border-black/60 cursor-pointer;
+    transition: transform 0.08s;
+  }
+  .tile.p1 {
+    outline: 4px solid #ff3b3b;
+    outline-offset: -2px;
+    transform: scale(1.06);
+    z-index: 2;
+  }
+  .tile.p2 {
+    outline: 4px solid #3b8bff;
+    outline-offset: -2px;
+    transform: scale(1.06);
+    z-index: 2;
+  }
+  .tile.p1.p2 {
+    outline: 4px dashed #ffd21a;
+  }
+  .bar {
+    @apply h-2.5 rounded-pill bg-black/50 overflow-hidden;
+  }
+  .bar > i {
+    @apply block h-full bg-accent;
+  }
+}
+
+@keyframes stripes {
+  to {
+    background-position: 51px 0;
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes floaty {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes slideL {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+}
+@keyframes slideR {
+  from {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+}
+.anim-pop {
+  animation: pop 0.35s ease-out both;
+}
+.anim-blink {
+  animation: blink 1s steps(2) infinite;
+}
+.anim-float {
+  animation: floaty 2.4s ease-in-out infinite;
+}
+.anim-slideL {
+  animation: slideL 0.3s ease-out both;
+}
+.anim-slideR {
+  animation: slideR 0.3s ease-out both;
+}
