@@ -123,6 +123,7 @@ export function Stars({ n, color = "#ffcc1a" }: { n: number; color?: string }) {
 const SLOT_SCRIPT: Record<MoveSlot | "support", (k: number) => number> = {
   L: (k) => (k === 6 ? BTN.LIGHT : 0),
   H: (k) => (k === 6 ? BTN.HEAVY : 0),
+  fH: (k) => (k <= 6 ? BTN.RIGHT : 0) | (k === 6 ? BTN.HEAVY : 0),
   cL: (k) => (k < 40 ? BTN.DOWN : 0) | (k === 8 ? BTN.LIGHT : 0),
   cH: (k) => (k < 50 ? BTN.DOWN : 0) | (k === 8 ? BTN.HEAVY : 0),
   jL: (k) => (k === 4 ? BTN.UP | BTN.RIGHT : 0) | (k === 16 ? BTN.LIGHT : 0),
@@ -132,16 +133,40 @@ const SLOT_SCRIPT: Record<MoveSlot | "support", (k: number) => number> = {
   sF: (k) => (k === 6 ? BTN.SPECIAL | BTN.RIGHT : 0),
   sD: (k) => (k === 6 ? BTN.SPECIAL | BTN.DOWN : 0),
   sU: (k) => (k === 6 ? BTN.SPECIAL | BTN.UP : 0),
+  jS: (k) => (k === 4 ? BTN.UP | BTN.RIGHT : 0) | (k === 14 ? BTN.SPECIAL : 0),
+  f1: () => 0,
+  f2: () => 0,
+  f3: () => 0,
   super: (k) => (k === 6 ? BTN.SUPER : 0),
   support: (k) => (k === 6 ? BTN.ASSIST : 0),
 };
+
+/** Follow-ups are shown by playing the whole chain from its first move. */
+function scriptFor(char: number, slot: MoveSlot | "support"): (k: number) => number {
+  if (slot !== "f1" && slot !== "f2" && slot !== "f3") return SLOT_SCRIPT[slot];
+  const moves = ROSTER[char].moves;
+  const path: MoveSlot[] = [slot];
+  for (let guard = 0; guard < 4; guard++) {
+    const parent = (Object.keys(moves) as MoveSlot[]).find((m) => moves[m]?.chain?.to === path[0]);
+    if (!parent) break;
+    path.unshift(parent);
+  }
+  const presses: number[] = [];
+  let start = 6;
+  for (let i = 0; i < path.length - 1; i++) {
+    start += (moves[path[i]]?.chain?.from ?? 0) + 1;
+    presses.push(start);
+  }
+  const root = SLOT_SCRIPT[path[0]];
+  return (k) => root(k) | (presses.includes(k) ? BTN.SPECIAL : 0);
+}
 
 function distanceFor(char: number, slot: MoveSlot | "support"): number {
   if (slot === "support") return 300;
   const def = ROSTER[char].moves[slot as MoveSlot];
   if (slot === "throw" || slot === "sD" && def?.hitboxes?.some((h) => h.hit.grab)) return 75;
   if (def?.projectiles?.length || def?.wall) return 330;
-  if (slot === "sF") return 230;
+  if (slot === "sF" || slot === "f1" || slot === "f2" || slot === "f3") return 230;
   return 110;
 }
 
@@ -164,8 +189,9 @@ export function MovePreview({ char, slot, className = "" }: { char: number; slot
     const r = new Renderer(canvas, true);
     r.setStage(ROSTER[char].stage);
     let state = previewState(char, slot);
+    const script = scriptFor(char, slot);
     r.reset(state);
-    const cycle = slot === "super" ? 210 : slot === "support" ? 170 : 130;
+    const cycle = slot === "super" ? 210 : slot === "support" ? 170 : slot === "f1" || slot === "f2" || slot === "f3" ? 190 : 130;
     let k = 0;
     let raf = 0;
     let last = performance.now();
@@ -179,7 +205,7 @@ export function MovePreview({ char, slot, className = "" }: { char: number; slot
           k = 0;
           state = previewState(char, slot);
         }
-        step(state, [SLOT_SCRIPT[slot](k), 0]);
+        step(state, [script(k), 0]);
         k++;
       }
       r.draw(state, { tags: ["", ""] });
@@ -193,7 +219,16 @@ export function MovePreview({ char, slot, className = "" }: { char: number; slot
 
 /** Tiny CSS flags (flag emoji do not render on Windows). */
 export function Flag({ country, className = "" }: { country: string; className?: string }) {
-  const base = `inline-block w-6 h-4 rounded-[2px] border border-black/60 overflow-hidden align-middle ${className}`;
+  // The wrapper takes the positioning classes, so a flag drawn with inner layers stays in place.
+  return (
+    <span className={`inline-block align-middle leading-none ${className}`}>
+      <FlagFace country={country} />
+    </span>
+  );
+}
+
+function FlagFace({ country }: { country: string }) {
+  const base = "block w-6 h-4 rounded-[2px] border border-black/60 overflow-hidden";
   switch (country) {
     case "us":
       return (
@@ -211,9 +246,33 @@ export function Flag({ country, className = "" }: { country: string; className?:
       );
     case "de":
       return <span className={base} style={{ background: "linear-gradient(180deg,#000 0 33%,#dd0000 33% 66%,#ffce00 66%)" }} />;
+    case "ar":
+      return (
+        <span className={base} style={{ background: "linear-gradient(180deg,#74acdf 0 33%,#fff 33% 66%,#74acdf 66%)", position: "relative" }}>
+          <span style={{ position: "absolute", left: "38%", top: "36%", width: "24%", height: "28%", borderRadius: "50%", background: "#f6b40e" }} />
+        </span>
+      );
+    case "gb":
+      return (
+        <span
+          className={base}
+          style={{
+            background:
+              "linear-gradient(0deg,transparent 40%,#c8102e 40% 60%,transparent 60%),linear-gradient(90deg,transparent 42%,#c8102e 42% 58%,transparent 58%),linear-gradient(0deg,transparent 30%,#fff 30% 70%,transparent 70%),linear-gradient(90deg,transparent 35%,#fff 35% 65%,transparent 65%),#012169",
+          }}
+        />
+      );
+    case "it":
+      return <span className={base} style={{ background: "linear-gradient(90deg,#008c45 0 33%,#f4f5f0 33% 66%,#cd212a 66%)" }} />;
+    case "kp":
+      return (
+        <span className={base} style={{ background: "linear-gradient(180deg,#024fa2 0 15%,#fff 15% 20%,#ed1c27 20% 80%,#fff 80% 85%,#024fa2 85%)", position: "relative" }}>
+          <span style={{ position: "absolute", left: "20%", top: "32%", width: "22%", height: "36%", borderRadius: "50%", background: "#fff" }} />
+        </span>
+      );
     default:
       return <span className={base} style={{ background: "linear-gradient(90deg,#1d3fa0 0 33%,#fff 33% 66%,#d7262e 66%)" }} />;
   }
 }
 
-export const COUNTRY: Record<string, string> = { tromp: "us", poutrine: "ru", pingpong: "cn", merguez: "de" };
+export const COUNTRY: Record<string, string> = { tromp: "us", poutrine: "ru", pingpong: "cn", merguez: "de", milanesa: "ar", johnsoup: "gb", mellone: "it", kimjongnem: "kp" };

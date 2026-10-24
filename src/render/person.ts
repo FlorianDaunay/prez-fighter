@@ -231,6 +231,25 @@ function torso(ctx: CanvasRenderingContext2D, look: Look, j: Joints, p: Pose) {
     ctx.arc(c[0], c[1], 6, 0, Math.PI);
     ctx.stroke();
   }
+  if (look.extras.includes("scarf")) {
+    const col = look.scarf ?? "#c8102e";
+    const n1 = at(1.0, -ws * 0.2), n2 = at(1.02, ws * 0.85), n3 = at(0.9, ws * 0.8), n4 = at(0.88, -ws * 0.1);
+    blob(ctx, () => {
+      ctx.moveTo(n1[0], n1[1]);
+      ctx.lineTo(n2[0], n2[1]);
+      ctx.lineTo(n3[0], n3[1]);
+      ctx.lineTo(n4[0], n4[1]);
+      ctx.closePath();
+    }, col, 2);
+    const e1 = at(0.95, ws * 0.45), e2 = at(0.95, ws * 0.7), e3 = at(0.4, ws * 0.75), e4 = at(0.42, ws * 0.5);
+    blob(ctx, () => {
+      ctx.moveTo(e1[0], e1[1]);
+      ctx.lineTo(e2[0], e2[1]);
+      ctx.lineTo(e3[0], e3[1]);
+      ctx.lineTo(e4[0], e4[1]);
+      ctx.closePath();
+    }, shade(col, -0.08), 2);
+  }
   const pin = at(0.78, ws * 0.12);
   if (look.extras.includes("redBadge")) {
     blob(ctx, () => {
@@ -247,6 +266,15 @@ function torso(ctx: CanvasRenderingContext2D, look: Look, j: Joints, p: Pose) {
     ctx.fillRect(pin[0] - 1, pin[1] - 3, 3, 6);
     ctx.fillStyle = "#d11a2a";
     ctx.fillRect(pin[0] + 2, pin[1] - 3, 3, 6);
+  }
+  if (look.extras.includes("pocketSquare")) {
+    const q = at(0.68, ws * 0.62);
+    blob(ctx, () => {
+      ctx.moveTo(q[0] - 4, q[1]);
+      ctx.lineTo(q[0] + 4, q[1]);
+      ctx.lineTo(q[0] + 1, q[1] - 6);
+      ctx.closePath();
+    }, "#f4f4f4", 1);
   }
   if (look.extras.includes("medals")) {
     const m = at(0.7, ws * 0.15);
@@ -295,6 +323,27 @@ function hairBack(ctx: CanvasRenderingContext2D, look: Look, fw: number, fh: num
         ctx.moveTo(fw * 0.3, -fh * 1.0);
         ctx.bezierCurveTo(-fw * 1.5, -fh * 1.15, -fw * 1.45, fh * 0.3, -fw * 1.15, fh * (look.hairStyle === "blondBobLayered" ? 1.05 : 0.8));
         ctx.lineTo(-fw * 0.2, fh * 0.85);
+        ctx.lineTo(fw * 0.2, -fh * 0.2);
+        ctx.closePath();
+      }, c);
+      break;
+    case "shaggy":
+      blob(ctx, () => {
+        ctx.moveTo(fw * 0.4, -fh * 1.1);
+        ctx.bezierCurveTo(-fw * 1.7, -fh * 1.3, -fw * 1.7, fh * 0.6, -fw * 1.3, fh * 1.0);
+        ctx.lineTo(-fw * 1.0, fh * 0.75);
+        ctx.lineTo(-fw * 0.85, fh * 1.05);
+        ctx.lineTo(-fw * 0.5, fh * 0.6);
+        ctx.lineTo(fw * 0.2, -fh * 0.2);
+        ctx.closePath();
+      }, c);
+      break;
+    case "sweptBack":
+    case "mop":
+      blob(ctx, () => {
+        ctx.moveTo(fw * 0.2, -fh * 1.0);
+        ctx.bezierCurveTo(-fw * 1.45, -fh * 1.1, -fw * 1.45, fh * 0.3, -fw * 1.05, fh * 0.55);
+        ctx.lineTo(-fw * 0.5, fh * 0.3);
         ctx.lineTo(fw * 0.2, -fh * 0.2);
         ctx.closePath();
       }, c);
@@ -538,9 +587,154 @@ function hairFront(ctx: CanvasRenderingContext2D, look: Look, fw: number, fh: nu
         ctx.closePath();
       }, c);
       break;
+    case "mop": // A blond haystack, combed by a hurricane.
+      blob(ctx, () => {
+        ctx.moveTo(-fw * 1.15, fh * 0.15);
+        ctx.lineTo(-fw * 1.3, -fh * 0.5);
+        ctx.lineTo(-fw * 1.0, -fh * 0.75);
+        ctx.lineTo(-fw * 1.05, -fh * 1.1);
+        ctx.lineTo(-fw * 0.55, -fh * 1.05);
+        ctx.lineTo(-fw * 0.35, -fh * 1.4);
+        ctx.lineTo(fw * 0.05, -fh * 1.15);
+        ctx.lineTo(fw * 0.45, -fh * 1.35);
+        ctx.lineTo(fw * 0.65, -fh * 1.05);
+        ctx.lineTo(fw * 1.2, -fh * 1.0);
+        ctx.lineTo(fw * 1.0, -fh * 0.7);
+        ctx.lineTo(fw * 1.15, -fh * 0.42);
+        ctx.lineTo(fw * 0.7, -fh * 0.52);
+        ctx.lineTo(fw * 0.45, -fh * 0.32);
+        ctx.lineTo(fw * 0.2, -fh * 0.55);
+        ctx.lineTo(-fw * 0.15, -fh * 0.35);
+        ctx.lineTo(-fw * 0.35, -fh * 0.55);
+        ctx.lineTo(-fw * 0.55, -fh * 0.1);
+        ctx.lineTo(-fw * 0.6, fh * 0.15);
+        ctx.closePath();
+      }, c);
+      ctx.strokeStyle = hi;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-fw * 0.7, -fh * 0.9);
+      ctx.lineTo(-fw * 0.2, -fh * 1.1);
+      ctx.moveTo(fw * 0.1, -fh * 0.95);
+      ctx.lineTo(fw * 0.7, -fh * 0.85);
+      ctx.stroke();
+      break;
+    case "shaggy": // Rock-star mane with a messy fringe.
+      blob(ctx, () => {
+        ctx.moveTo(-fw * 1.1, fh * 0.45);
+        ctx.bezierCurveTo(-fw * 1.4, -fh * 1.3, fw * 0.6, -fh * 1.55, fw * 1.15, -fh * 0.65);
+        ctx.lineTo(fw * 0.85, -fh * 0.6);
+        ctx.lineTo(fw * 0.9, -fh * 0.35);
+        ctx.lineTo(fw * 0.5, -fh * 0.55);
+        ctx.lineTo(fw * 0.35, -fh * 0.3);
+        ctx.lineTo(fw * 0.05, -fh * 0.58);
+        ctx.lineTo(-fw * 0.25, -fh * 0.35);
+        ctx.quadraticCurveTo(-fw * 0.5, -fh * 0.3, -fw * 0.45, fh * 0.1);
+        ctx.lineTo(-fw * 0.55, fh * 0.45);
+        ctx.closePath();
+      }, c);
+      ctx.strokeStyle = hi;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-fw * (0.8 - i * 0.3), -fh * (0.95 + i * 0.08));
+        ctx.quadraticCurveTo(fw * (0.1 + i * 0.2), -fh * 1.1, fw * (0.5 + i * 0.2), -fh * 0.6);
+        ctx.stroke();
+      }
+      break;
+    case "undercut": // Flat top, shaved sides.
+      ctx.fillStyle = shade(look.skin, -0.2);
+      ctx.beginPath();
+      ctx.ellipse(-fw * 0.55, -fh * 0.35, fw * 0.45, fh * 0.42, 0, 0, Math.PI * 2);
+      ctx.fill();
+      blob(ctx, () => {
+        ctx.moveTo(-fw * 0.95, -fh * 0.55);
+        ctx.quadraticCurveTo(-fw * 1.0, -fh * 1.2, -fw * 0.2, -fh * 1.22);
+        ctx.quadraticCurveTo(fw * 0.7, -fh * 1.25, fw * 0.95, -fh * 0.8);
+        ctx.quadraticCurveTo(fw * 0.5, -fh * 0.72, fw * 0.1, -fh * 0.78);
+        ctx.quadraticCurveTo(-fw * 0.5, -fh * 0.75, -fw * 0.95, -fh * 0.55);
+        ctx.closePath();
+      }, c);
+      ctx.strokeStyle = hi;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-fw * 0.6, -fh * 1.0);
+      ctx.quadraticCurveTo(fw * 0.1, -fh * 1.15, fw * 0.7, -fh * 0.92);
+      ctx.stroke();
+      break;
+    case "sweptBack": // Thick hair swept back with volume.
+      blob(ctx, () => {
+        ctx.moveTo(-fw * 1.05, fh * 0.25);
+        ctx.bezierCurveTo(-fw * 1.3, -fh * 1.0, -fw * 0.3, -fh * 1.4, fw * 0.55, -fh * 1.08);
+        ctx.quadraticCurveTo(fw * 0.85, -fh * 0.95, fw * 0.7, -fh * 0.7);
+        ctx.quadraticCurveTo(fw * 0.2, -fh * 0.85, -fw * 0.2, -fh * 0.7);
+        ctx.quadraticCurveTo(-fw * 0.55, -fh * 0.4, -fw * 0.55, fh * 0.25);
+        ctx.closePath();
+      }, c);
+      ctx.strokeStyle = hi;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(fw * (0.45 - i * 0.25), -fh * (1.05 - i * 0.02));
+        ctx.quadraticCurveTo(-fw * (0.3 + i * 0.15), -fh * 1.0, -fw * (0.95 + i * 0.03), -fh * (0.3 - i * 0.1));
+        ctx.stroke();
+      }
+      break;
     case "none":
       break;
   }
+}
+
+/** Facial hair, clipped to the face so it follows the jaw. */
+function facialHair(ctx: CanvasRenderingContext2D, look: Look, fw: number, fh: number, face: () => void, mouthY: number) {
+  const beard = look.extras.includes("beard");
+  const stubble = look.extras.includes("stubble");
+  const burns = look.extras.includes("sideburns");
+  if (!beard && !stubble && !burns) return;
+  const color = look.beardColor ?? look.hair;
+  ctx.save();
+  ctx.beginPath();
+  face();
+  ctx.clip();
+  if (burns) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-fw * 0.62, -fh * 0.35);
+    ctx.lineTo(-fw * 0.3, -fh * 0.3);
+    ctx.lineTo(-fw * 0.2, fh * 0.45);
+    ctx.lineTo(-fw * 0.55, fh * 0.35);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if (beard || stubble) {
+    ctx.fillStyle = beard ? color : "rgba(70,55,45,0.28)";
+    ctx.beginPath();
+    ctx.moveTo(-fw * 0.55, -fh * 0.05);
+    ctx.quadraticCurveTo(-fw * 0.2, fh * 0.2, fw * 0.25, mouthY - 7);
+    ctx.quadraticCurveTo(fw * 0.6, mouthY - 10, fw * 1.1, mouthY - 6);
+    ctx.lineTo(fw * 1.2, fh * 1.4);
+    ctx.lineTo(-fw * 1.2, fh * 1.4);
+    ctx.closePath();
+    ctx.fill();
+    if (beard) {
+      ctx.strokeStyle = shade(color, 0.15);
+      ctx.lineWidth = 1.2;
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-fw * 0.2 + i * fw * 0.25, mouthY + 6);
+        ctx.lineTo(-fw * 0.25 + i * fw * 0.25, mouthY + 14);
+        ctx.stroke();
+      }
+    } else {
+      ctx.fillStyle = "rgba(50,40,30,0.35)";
+      for (let i = 0; i < 26; i++) {
+        const x = -fw * 0.4 + ((i * 37) % 23) * fw * 0.06;
+        const y = mouthY - 6 + ((i * 17) % 11) * 2.2;
+        ctx.fillRect(x, y, 1.4, 1.4);
+      }
+    }
+  }
+  ctx.restore();
 }
 
 function eye(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, look: Look, expr: Expr, far: boolean) {
@@ -634,6 +828,10 @@ export function drawHead(ctx: CanvasRenderingContext2D, look: Look, expr: Expr) 
     ctx.quadraticCurveTo(fw * 0.25, fh * 0.35, fw * 0.32, fh * 0.55);
     ctx.stroke();
   }
+  facialHair(ctx, look, fw, fh, () => {
+    cranium();
+    jawPath();
+  }, Math.max(fh * 0.42, -fh * 0.12 + 13 * look.nose + 4));
   // Eyes
   const ey = -fh * 0.12;
   const er2 = 5.2;
@@ -855,6 +1053,10 @@ export function drawBust(ctx: CanvasRenderingContext2D, look: Look, x: number, y
     ctx.fill();
   }
   limb(ctx, [[4, 24], [4, 10]], 14, look.skin);
+  if (look.extras.includes("scarf")) {
+    blob(ctx, () => ctx.roundRect(-22, 14, 46, 14, 6), look.scarf ?? "#c8102e", 2);
+    blob(ctx, () => ctx.rect(8, 22, 12, 40), shade(look.scarf ?? "#c8102e", -0.08), 2);
+  }
   ctx.translate(4, -18);
   drawHead(ctx, look, expr);
   ctx.restore();

@@ -1,6 +1,7 @@
 /** Cached portrait canvases (busts) for the HUD and the menus. */
 import { LOOKS } from "./looks";
 import { drawBust, type Expr } from "./person";
+import { drawSprite } from "./sprites";
 
 const cache = new Map<string, HTMLCanvasElement>();
 
@@ -15,6 +16,11 @@ export function portrait(lookId: string, size = 128, facing: 1 | -1 = 1, expr: E
   if (bg) {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, size, size);
+  }
+  if (lookId.startsWith("@")) {
+    drawSprite(ctx, lookId.slice(1), size / 2, size / 2, size * 0.8, 0, facing < 0);
+    cache.set(key, c);
+    return c;
   }
   const look = LOOKS[lookId];
   const scale = (size / 128) * 1.75 / Math.max(0.9, look.height);

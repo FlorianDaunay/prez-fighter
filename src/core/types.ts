@@ -11,7 +11,8 @@ export type StatusKind =
   | "freeze" // cannot move nor act (ice)
   | "taxed" // takes +30% damage
   | "dot" // loses a little health over time
-  | "shield"; // own: blocks the next projectile
+  | "shield" // own: blocks the next projectile
+  | "rage"; // own: deals +25% damage
 
 export interface StatusDef {
   kind: StatusKind;
@@ -39,6 +40,8 @@ export interface HitDef {
   grab?: boolean;
   status?: StatusDef;
   meterDrain?: number;
+  /** Fraction of the damage given back to the attacker as health. */
+  steal?: number;
   /** Freeze frames on contact (default from damage). */
   hitstop?: number;
 }
@@ -116,8 +119,19 @@ export interface MotionDef {
 }
 
 export type MoveSlot =
-  | "L" | "H" | "cL" | "cH" | "jL" | "jH" | "throw"
-  | "sN" | "sF" | "sD" | "sU" | "super";
+  | "L" | "H" | "fH" | "cL" | "cH" | "jL" | "jH" | "throw"
+  | "sN" | "sF" | "sD" | "sU" | "jS" | "super"
+  /** Follow-ups, only reachable through a chain. */
+  | "f1" | "f2" | "f3";
+
+/** Pressing Special again during [from, until] goes on with another move (rekka). */
+export interface ChainDef {
+  to: MoveSlot;
+  from: number;
+  until: number;
+  /** Only if the current move touched. */
+  onHit?: boolean;
+}
 
 export interface MoveDef {
   name: string;
@@ -144,6 +158,11 @@ export interface MoveDef {
   meterGain?: number;
   /** Teleports next to (behind) the opponent at the given frame. */
   teleport?: number;
+  chain?: ChainDef;
+  /** Sends back the opponent's projectiles touched during this window. */
+  reflect?: [number, number];
+  /** Health restored when the move starts. */
+  heal?: number;
 }
 
 export type SupportEntry = "walk" | "fly" | "drop" | "drive";
@@ -182,6 +201,9 @@ export interface Stats {
   power: number;
 }
 
+/** Shape of the normal attacks: frame data, reach and damage trade-offs. */
+export type FightStyle = "allround" | "boxer" | "brawler" | "grappler" | "zoner" | "rushdown";
+
 export interface CharacterDef {
   id: string;
   name: string;
@@ -193,6 +215,7 @@ export interface CharacterDef {
   look: string;
   stage: string;
   stats: Stats;
+  style: FightStyle;
   moves: Partial<Record<MoveSlot, MoveDef>>;
   support: SupportDef;
   lore: string;

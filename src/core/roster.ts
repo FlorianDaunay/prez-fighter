@@ -2,16 +2,11 @@
  * The cast. Every name, quote and story here is fictional parody: these characters are
  * caricatures, their words are invented for laughs.
  */
-import { dashMove, hit, normals, projectileMove, shot, upperMove } from "./moves";
-import type { CharacterDef, Stats } from "./types";
+import { NEW_CAST } from "./cast2";
+import { build, dashMove, hit, projectileMove, shot, stats, upperMove } from "./moves";
+import type { CharacterDef } from "./types";
 
-const stats = (walk: number, jumpV: number, size: number, power: number, hp = 1000): Stats => ({ walk, jumpV, hp, size, power });
-
-function build(def: Omit<CharacterDef, "moves"> & { moves: CharacterDef["moves"] }): CharacterDef {
-  return { ...def, moves: { ...normals(def.stats), ...def.moves } };
-}
-
-export const ROSTER: CharacterDef[] = [
+const CLASSIC: CharacterDef[] = [
   build({
     id: "macaron",
     name: "Emmanuel Macaron",
@@ -21,10 +16,39 @@ export const ROSTER: CharacterDef[] = [
     look: "macaron",
     stage: "elysee",
     stats: stats(4.2, 17.5, 1, 1),
+    style: "allround",
     rating: { power: 3, speed: 4, range: 3, difficulty: 2 },
     moves: {
       sN: projectileMove("Start-up Nation", "Lance une licorne disruptive. Levée de fonds incluse.", shot("@unicorn", { vx: 8, hit: hit(70, 22, 16, 5) }), { shout: "Start-up nation !" }),
-      sF: dashMove("Je traverse la rue", "Traverse l'écran pour vous trouver un emploi. Ou un coup.", { shout: "Je traverse la rue !", fx: "speed", motion: [{ from: 6, to: 24, vx: 11 }] }),
+      fH: {
+        name: "Poignée de Main Virile",
+        desc: "→ + Lourd au contact : une poignée de main qui ne se refuse pas. Impossible à garder.",
+        frames: 38,
+        pose: "grab",
+        hitboxes: [{ x: 50, y: 110, w: 56, h: 110, from: 4, to: 6, hit: hit(80, 28, 0, 10, { grab: true, knockdown: true }) }],
+        meterGain: 25,
+      },
+      sF: dashMove("Je traverse la rue", "Traverse l'écran. Spécial pendant la ruée : « …et je vous trouve un emploi ! »", { shout: "Je traverse la rue !", fx: "speed", motion: [{ from: 6, to: 24, vx: 11 }], chain: { to: "f1", from: 12, until: 30 } }),
+      f1: {
+        name: "…Et Je Vous Trouve un Emploi",
+        desc: "Suite de la ruée : un coup de pied montant qui envoie en l'air.",
+        frames: 40,
+        pose: "kick",
+        motion: [{ from: 2, to: 8, vx: 3 }],
+        hitboxes: [{ x: 70, y: 130, w: 80, h: 80, from: 6, to: 10, hit: hit(65, 24, 16, 5, { launch: 10, knockdown: true }) }],
+        meterGain: 40,
+      },
+      jS: {
+        name: "Descente Jupitérienne",
+        desc: "En l'air : plongeon en piqué, foudre comprise.",
+        frames: 30,
+        pose: "diveKick",
+        air: true,
+        fx: "lightning",
+        motion: [{ from: 3, to: 24, vx: 8, vy: -13 }],
+        hitboxes: [{ x: 40, y: 30, w: 60, h: 50, from: 4, to: 24, hit: hit(65, 22, 14, 5, { overhead: true }) }],
+        meterGain: 40,
+      },
       sD: {
         name: "En même temps",
         desc: "Frappe devant ET derrière. Personne n'est épargné, en même temps.",
@@ -76,8 +100,17 @@ export const ROSTER: CharacterDef[] = [
     look: "lepain",
     stage: "meeting",
     stats: stats(3.8, 17, 1.02, 1.1, 1040),
+    style: "brawler",
     rating: { power: 4, speed: 3, range: 3, difficulty: 2 },
     moves: {
+      fH: {
+        name: "Coup de Baguette",
+        desc: "→ + Lourd : une baguette tradition abattue de haut. À garder debout.",
+        frames: 34,
+        pose: "chop",
+        hitboxes: [{ x: 70, y: 140, w: 70, h: 70, from: 13, to: 16, hit: hit(85, 24, 15, 6, { overhead: true }) }],
+        meterGain: 20,
+      },
       sN: projectileMove("Flamme Tricolore", "Une flamme lente qui frappe deux fois.", shot("#flame", { vx: 6, w: 60, h: 60, hits: 2, hit: hit(45, 20, 14, 4) }), { shout: "Flamme !" }),
       sF: dashMove("Dédiabolisation", "Ruée en super-armure : elle encaisse un coup sans broncher, tout sourire.", { armor: [4, 22], fx: "smile", shout: "Je suis normale !" }),
       sD: {
@@ -94,7 +127,7 @@ export const ROSTER: CharacterDef[] = [
         name: "Vague Bleu Marine",
         desc: "Une déferlante traverse tout l'écran. Multi-coups.",
         frames: 84,
-        pose: "decree",
+        pose: "wave",
         invuln: [0, 26],
         shout: "Au second tour !",
         projectiles: [
@@ -103,10 +136,10 @@ export const ROSTER: CharacterDef[] = [
       },
     },
     support: {
-      name: "Jordan Bardelle",
+      name: "Jordan Mortadella",
       desc: "Le gendre idéal dégaine son téléphone : 2 millions de vues et un adversaire ébloui.",
       members: 1,
-      look: "bardelle",
+      look: "mortadella",
       entry: "walk",
       frames: 70,
       actFrame: 22,
@@ -127,6 +160,7 @@ export const ROSTER: CharacterDef[] = [
     look: "meluchon",
     stage: "republique",
     stats: stats(3.9, 17, 1.0, 1.0),
+    style: "brawler",
     rating: { power: 3, speed: 3, range: 5, difficulty: 3 },
     moves: {
       sN: projectileMove(
@@ -137,9 +171,10 @@ export const ROSTER: CharacterDef[] = [
       ),
       sF: {
         name: "La République, c'est moi !",
-        desc: "Hurlement surpuissant : une onde de choc qui repousse très loin.",
+        desc: "Hurlement surpuissant qui repousse très loin… et le met en rage (+25 % de dégâts).",
         frames: 42,
         pose: "shout",
+        selfStatus: { kind: "rage", frames: 240 },
         shout: "La République, c'est moi !",
         fx: "shout",
         hitboxes: [{ x: 100, y: 120, w: 150, h: 150, from: 10, to: 18, hit: hit(80, 24, 18, 16, { knockdown: true }) }],
@@ -154,12 +189,22 @@ export const ROSTER: CharacterDef[] = [
         projectiles: [{ frame: 16, origin: "oppGround", x: 0, y: 75, vx: 0, w: 70, h: 150, life: 30, hits: 1, hit: hit(85, 28, 16, 3, { launch: 13, knockdown: true }), sprite: "#picket" }],
         meterGain: 60,
       },
-      sU: upperMove("Tribune", "Il bondit sur son pupitre et frappe vers le ciel.", { fx: "podium" }),
+      sU: {
+        name: "Insoumission",
+        desc: "« Je ne me soumets pas ! » : renvoie les projectiles et frappe vers le haut.",
+        frames: 40,
+        pose: "palm",
+        reflect: [3, 22],
+        fx: "podium",
+        shout: "Je ne me soumets pas !",
+        hitboxes: [{ x: 45, y: 170, w: 80, h: 110, from: 5, to: 12, hit: hit(75, 24, 16, 4, { launch: 10, knockdown: true }) }],
+        meterGain: 50,
+      },
       super: {
         name: "VIe République",
         desc: "Six chiffres romains tombent du ciel. Changement de régime garanti.",
         frames: 90,
-        pose: "decree",
+        pose: "megaphone",
         invuln: [0, 28],
         shout: "Vive la VIe !",
         projectiles: [
@@ -192,6 +237,7 @@ export const ROSTER: CharacterDef[] = [
     look: "sarkozix",
     stage: "yacht",
     stats: stats(4.9, 18.5, 0.88, 0.95, 960),
+    style: "rushdown",
     rating: { power: 3, speed: 5, range: 2, difficulty: 3 },
     moves: {
       sN: projectileMove(
@@ -210,6 +256,28 @@ export const ROSTER: CharacterDef[] = [
         motion: [{ from: 4, to: 30, vx: 3.6 }],
         hitboxes: [{ x: 60, y: 110, w: 70, h: 90, from: 6, to: 30, every: 5, hit: hit(19, 14, 9, 1.5, { hitstop: 3 }) }],
         meterGain: 60,
+        chain: { to: "f1", from: 18, until: 40, onHit: true },
+      },
+      f1: {
+        name: "…Pour Gagner Plus !",
+        desc: "Si la rafale touche : uppercut final qui envoie en l'air.",
+        frames: 44,
+        pose: "uppercut",
+        shout: "Gagner plus !",
+        motion: [{ from: 2, to: 12, vx: 2, vy: 12 }],
+        hitboxes: [{ x: 45, y: 150, w: 70, h: 120, from: 2, to: 12, hit: hit(75, 26, 16, 4, { launch: 13, knockdown: true }) }],
+        meterGain: 40,
+      },
+      jS: {
+        name: "Coup de Talonnette",
+        desc: "En l'air : plongeon talon en avant, très rapide.",
+        frames: 28,
+        pose: "diveKick",
+        air: true,
+        fx: "heels",
+        motion: [{ from: 2, to: 22, vx: 9, vy: -14 }],
+        hitboxes: [{ x: 40, y: 30, w: 60, h: 50, from: 3, to: 22, hit: hit(55, 20, 14, 5, { overhead: true }) }],
+        meterGain: 40,
       },
       sD: {
         name: "Casse-toi !",
@@ -226,7 +294,7 @@ export const ROSTER: CharacterDef[] = [
         name: "Bling-Bling",
         desc: "Pluie de montres en or. Si à 50 ans vous n'en avez pas pris une…",
         frames: 90,
-        pose: "decree",
+        pose: "spin",
         invuln: [0, 26],
         shout: "Bling-bling !",
         projectiles: [
@@ -259,7 +327,9 @@ export const ROSTER: CharacterDef[] = [
     look: "hollandaise",
     stage: "correze",
     stats: stats(3.6, 16.5, 1.0, 1.0, 1050),
+    style: "allround",
     rating: { power: 3, speed: 2, range: 4, difficulty: 4 },
+    tweak: { fH: { name: "Coup de Casque", desc: "→ + Lourd : le casque de scooter, toujours sur lui." } },
     moves: {
       sN: projectileMove(
         "Moi, Président",
@@ -267,6 +337,16 @@ export const ROSTER: CharacterDef[] = [
         shot("#text:MOI PRÉSIDENT", { count: 4, interval: 9, vx: 7, w: 110, h: 30, hit: hit(24, 15, 10, 2) }),
         { shout: "Moi, Président…", frames: 56 }
       ),
+      jS: {
+        name: "Plongeon Normal",
+        desc: "En l'air : il retombe de tout son poids. Normalement.",
+        frames: 34,
+        pose: "bodySlam",
+        air: true,
+        motion: [{ from: 4, to: 28, vx: 3, vy: -11 }],
+        hitboxes: [{ x: 30, y: 40, w: 100, h: 80, from: 6, to: 28, hit: hit(80, 24, 16, 6, { overhead: true, knockdown: true }) }],
+        meterGain: 40,
+      },
       sF: projectileMove(
         "Boîte à Outils",
         "Lance sa boîte à outils en cloche. Retombe en attaque haute.",
@@ -296,7 +376,7 @@ export const ROSTER: CharacterDef[] = [
         name: "Inversion de la Courbe",
         desc: "La courbe du chômage, enfin inversée, balaie tout l'écran.",
         frames: 88,
-        pose: "decree",
+        pose: "shrug",
         invuln: [0, 28],
         shout: "La courbe s'inverse !",
         projectiles: [{ frame: 20, x: 40, y: 110, vx: 8, w: 180, h: 200, life: 140, hits: 5, pierce: true, hit: hit(60, 22, 12, 3, { hitstop: 6 }), sprite: "#curve" }],
@@ -328,6 +408,7 @@ export const ROSTER: CharacterDef[] = [
     look: "chirashi",
     stage: "salon",
     stats: stats(3.7, 16.5, 1.1, 1.15, 1080),
+    style: "grappler",
     rating: { power: 5, speed: 2, range: 3, difficulty: 2 },
     moves: {
       sN: projectileMove(
@@ -343,12 +424,40 @@ export const ROSTER: CharacterDef[] = [
         { frame: 14, x: 50, y: 0, vx: 7, w: 70, h: 40, life: 110, hit: hit(70, 22, 14, 4, { low: true, launch: 8, knockdown: true }), sprite: "#crack" },
         { pose: "stomp", shout: "Fracture sociale !" }
       ),
-      sU: upperMove("Abracadabrantesque", "Tourbillon magique invincible. Une explication abracadabrantesque.", { fx: "sparkle" }),
+      fH: {
+        name: "Poignée de Main du Salon",
+        desc: "→ + Lourd au contact : 3 000 mains serrées par jour, la vôtre en dernier. Impossible à garder.",
+        frames: 40,
+        pose: "grab",
+        hitboxes: [{ x: 52, y: 110, w: 70, h: 120, from: 4, to: 6, hit: hit(100, 30, 0, 12, { grab: true, knockdown: true, launch: 8 }) }],
+        meterGain: 25,
+      },
+      sU: {
+        name: "Abracadabrantesque",
+        desc: "Tourbillon magique qui s'élève : plusieurs coups, invincible au démarrage.",
+        frames: 48,
+        pose: "spin",
+        fx: "sparkle",
+        invuln: [1, 8],
+        motion: [{ from: 3, to: 14, vx: 1.5, vy: 9 }],
+        hitboxes: [{ x: 0, y: 150, w: 150, h: 150, from: 4, to: 28, every: 6, hit: hit(28, 16, 10, 2, { launch: 7 }) }],
+        meterGain: 60,
+      },
+      jS: {
+        name: "Sumo Splash",
+        desc: "En l'air : un plat de yokozuna. Gros dégâts, attaque haute.",
+        frames: 36,
+        pose: "bodySlam",
+        air: true,
+        motion: [{ from: 4, to: 30, vx: 2.5, vy: -12 }],
+        hitboxes: [{ x: 30, y: 40, w: 120, h: 90, from: 6, to: 30, hit: hit(100, 26, 16, 7, { overhead: true, knockdown: true }) }],
+        meterGain: 50,
+      },
       super: {
         name: "Dissolution",
         desc: "Il dissout tout autour de lui. Explosion énorme… et imprévisible.",
         frames: 80,
-        pose: "decree",
+        pose: "stomp",
         invuln: [0, 40],
         shout: "Je dissous !",
         fx: "explosion",
@@ -380,6 +489,7 @@ export const ROSTER: CharacterDef[] = [
     look: "degaufre",
     stage: "arc",
     stats: stats(3.5, 16.5, 1.16, 1.05, 1060),
+    style: "zoner",
     rating: { power: 4, speed: 2, range: 5, difficulty: 3 },
     moves: {
       sN: projectileMove(
@@ -397,6 +507,16 @@ export const ROSTER: CharacterDef[] = [
         motion: [{ from: 5, to: 24, vx: 5.5 }],
         hitboxes: [{ x: 50, y: 150, w: 90, h: 130, from: 8, to: 24, every: 10, hit: hit(55, 20, 14, 5) }],
         meterGain: 60,
+        chain: { to: "f1", from: 20, until: 40 },
+      },
+      f1: {
+        name: "…Vive la France !",
+        desc: "Suite : il lève les bras au ciel et envoie l'adversaire en l'air.",
+        frames: 42,
+        pose: "vArms",
+        shout: "Vive la France !",
+        hitboxes: [{ x: 50, y: 170, w: 110, h: 140, from: 8, to: 13, hit: hit(70, 26, 16, 5, { launch: 12, knockdown: true }) }],
+        meterGain: 40,
       },
       sD: {
         name: "La Chienlit",
@@ -408,7 +528,12 @@ export const ROSTER: CharacterDef[] = [
         hitboxes: [{ x: 0, y: 14, w: 320, h: 30, from: 12, to: 16, hit: hit(75, 24, 14, 6, { low: true, knockdown: true }) }],
         meterGain: 60,
       },
-      sU: upperMove("Vive le Québec Libre !", "Tourbillon de feuilles d'érable vers le ciel.", { fx: "maple" }),
+      sU: projectileMove(
+        "Vive le Québec Libre !",
+        "Trois feuilles d'érable montent en diagonale : anti-aérien à distance.",
+        shot("@leaf", { frame: 10, count: 3, interval: 4, x: 40, y: 170, vx: 4, vy: 7, spreadVy: [0, 1.5, 3], life: 70, w: 44, h: 44, hit: hit(40, 20, 14, 4, { launch: 8 }) }),
+        { pose: "raise", fx: "maple", shout: "Vive le Québec libre !" }
+      ),
       super: {
         name: "Une Certaine Idée de la France",
         desc: "Un rayon tricolore qui traverse tout.",
@@ -444,10 +569,32 @@ export const ROSTER: CharacterDef[] = [
     look: "royaume",
     stage: "plage",
     stats: stats(4.3, 17.5, 0.95, 0.95, 980),
+    style: "boxer",
     rating: { power: 3, speed: 4, range: 3, difficulty: 2 },
+    tweak: { fH: { name: "Crochet du Poitou" } },
     moves: {
       sN: projectileMove("Bravitude", "Un néologisme lancé si fort qu'il blesse.", shot("#text:BRAVITUDE", { vx: 8.5, w: 120, h: 34, hit: hit(68, 22, 16, 5) }), { shout: "Bravitude !" }),
-      sF: dashMove("Fraternité !", "Ruée bras ouverts. L'étreinte qui fait mal.", { pose: "hug", fx: "hearts", shout: "Fraternité !" }, { damage: 85 }),
+      sF: dashMove("Fraternité !", "Ruée bras ouverts. Spécial si elle touche : « Désirs d'avenir » !", { pose: "hug", fx: "hearts", shout: "Fraternité !", chain: { to: "f1", from: 14, until: 34, onHit: true } }, { damage: 85, knockdown: false, hitstun: 30 }),
+      f1: {
+        name: "Désirs d'Avenir",
+        desc: "Si l'étreinte touche : un uppercut plein d'avenir.",
+        frames: 44,
+        pose: "uppercut",
+        shout: "Désirs d'avenir !",
+        motion: [{ from: 2, to: 12, vx: 2, vy: 12 }],
+        hitboxes: [{ x: 45, y: 150, w: 70, h: 120, from: 2, to: 12, hit: hit(70, 26, 16, 4, { launch: 13, knockdown: true }) }],
+        meterGain: 40,
+      },
+      jS: {
+        name: "Saut de Bravitude",
+        desc: "En l'air : coup de pied sauté à deux pieds.",
+        frames: 30,
+        pose: "dropkick",
+        air: true,
+        motion: [{ from: 3, to: 20, vx: 7, vy: -4 }],
+        hitboxes: [{ x: 50, y: 50, w: 80, h: 50, from: 5, to: 20, hit: hit(70, 22, 14, 8, { overhead: true, knockdown: true }) }],
+        meterGain: 40,
+      },
       sD: {
         name: "Portique Écotaxe",
         desc: "Un portique tombe devant elle : bloque les projectiles, frappe en tombant.",
@@ -462,7 +609,7 @@ export const ROSTER: CharacterDef[] = [
         name: "L'Ordre Juste",
         desc: "Une balance de la justice géante s'abat sur l'adversaire.",
         frames: 84,
-        pose: "decree",
+        pose: "point",
         invuln: [0, 28],
         shout: "L'ordre juste !",
         projectiles: [{ frame: 18, origin: "sky", x: 0, y: 520, vx: 0, vy: -15, w: 150, h: 140, life: 60, hits: 2, pierce: true, hit: hit(150, 40, 14, 6, { knockdown: true, hitstop: 12 }), sprite: "@scales", size: 120 }],
@@ -493,10 +640,38 @@ export const ROSTER: CharacterDef[] = [
     look: "tromp",
     stage: "golf",
     stats: stats(3.6, 16, 1.12, 1.15, 1080),
+    style: "brawler",
     rating: { power: 5, speed: 2, range: 3, difficulty: 2 },
     moves: {
+      fH: {
+        name: "Vous Êtes Viré !",
+        desc: "→ + Lourd : il pointe du doigt de très loin. Repousse fort.",
+        frames: 34,
+        pose: "point",
+        hitboxes: [{ x: 110, y: 140, w: 90, h: 40, from: 11, to: 14, hit: hit(70, 22, 14, 12) }],
+        meterGain: 20,
+      },
       sN: projectileMove("Post Truth", "Un message en majuscules : TOUT LE MONDE LE DIT.", shot("#text:SAD!", { vx: 8, w: 90, h: 40, hit: hit(68, 22, 16, 5) }), { shout: "Fake news !" }),
-      sF: dashMove("Tarifs Douaniers", "Ruée taxée : l'adversaire touché subit +30 % de dégâts pendant 4 s.", { fx: "percent", shout: "Tarifs à 200 % !" }, { damage: 70, status: { kind: "taxed", frames: 240 } }),
+      sF: dashMove("Tarifs Douaniers", "Ruée taxée : l'adversaire touché subit +30 % de dégâts pendant 4 s. Spécial si elle touche : nouveaux tarifs !", { fx: "percent", shout: "Tarifs à 200 % !", chain: { to: "f1", from: 14, until: 32, onHit: true } }, { damage: 70, status: { kind: "taxed", frames: 240 }, knockdown: false, hitstun: 30 }),
+      f1: {
+        name: "Tarifs Réciproques",
+        desc: "Si la ruée touche : un second coup, encore plus taxé.",
+        frames: 40,
+        pose: "haymaker",
+        shout: "Et encore 100 % !",
+        hitboxes: [{ x: 65, y: 120, w: 80, h: 90, from: 10, to: 13, hit: hit(80, 26, 16, 10, { knockdown: true }) }],
+        meterGain: 40,
+      },
+      jS: {
+        name: "Air Force One",
+        desc: "En l'air : il atterrit de tout son poids. Attaque haute.",
+        frames: 36,
+        pose: "bodySlam",
+        air: true,
+        motion: [{ from: 4, to: 30, vx: 3, vy: -12 }],
+        hitboxes: [{ x: 30, y: 40, w: 120, h: 90, from: 6, to: 30, hit: hit(90, 26, 16, 7, { overhead: true, knockdown: true }) }],
+        meterGain: 50,
+      },
       sD: {
         name: "The Wall",
         desc: "Construit un mur (payé par l'adversaire). Bloque les projectiles.",
@@ -511,7 +686,7 @@ export const ROSTER: CharacterDef[] = [
         name: "Fake News !",
         desc: "Tempête de journaux sur tout l'écran.",
         frames: 90,
-        pose: "decree",
+        pose: "megaphone",
         invuln: [0, 28],
         shout: "FAKE NEWS !",
         projectiles: [
@@ -545,7 +720,9 @@ export const ROSTER: CharacterDef[] = [
     look: "poutrine",
     stage: "kremlin",
     stats: stats(4.0, 17, 0.92, 1.12, 1040),
+    style: "grappler",
     rating: { power: 5, speed: 3, range: 2, difficulty: 3 },
+    tweak: { fH: { name: "Plaquage de Sambo" } },
     moves: {
       sN: projectileMove(
         "Gazoduc",
@@ -555,12 +732,12 @@ export const ROSTER: CharacterDef[] = [
       ),
       sF: {
         name: "Judo Ceinture Noire",
-        desc: "Saisie de judo dévastatrice. Impossible à garder.",
+        desc: "Saisie de judo dévastatrice, impossible à garder. Il annexe un peu de votre vie au passage.",
         frames: 48,
         pose: "grab",
         shout: "Hajime !",
         motion: [{ from: 2, to: 9, vx: 6 }],
-        hitboxes: [{ x: 50, y: 100, w: 64, h: 130, from: 5, to: 9, hit: hit(150, 36, 0, 12, { grab: true, launch: 13, knockdown: true }) }],
+        hitboxes: [{ x: 50, y: 100, w: 64, h: 130, from: 5, to: 9, hit: hit(140, 36, 0, 12, { grab: true, launch: 13, knockdown: true, steal: 0.3 }) }],
         meterGain: 60,
       },
       sD: {
@@ -575,11 +752,21 @@ export const ROSTER: CharacterDef[] = [
         meterGain: 60,
       },
       sU: upperMove("Chevauchée de l'Ours", "Il surgit à dos d'ours vers le ciel.", { fx: "bear" }),
+      jS: {
+        name: "Parachutage",
+        desc: "En l'air : descente en piqué très verticale.",
+        frames: 30,
+        pose: "diveKick",
+        air: true,
+        motion: [{ from: 3, to: 24, vx: 4, vy: -16 }],
+        hitboxes: [{ x: 30, y: 30, w: 60, h: 60, from: 4, to: 24, hit: hit(70, 24, 14, 5, { overhead: true, knockdown: true }) }],
+        meterGain: 40,
+      },
       super: {
         name: "Hiver Russe",
         desc: "Blizzard sur tout l'écran : l'adversaire touché est gelé.",
         frames: 90,
-        pose: "decree",
+        pose: "crossArms",
         invuln: [0, 28],
         shout: "L'hiver arrive !",
         projectiles: [{ frame: 20, origin: "screenBack", x: 0, y: 120, vx: 8.5, w: 200, h: 260, life: 170, hits: 4, pierce: true, hit: hit(62, 22, 12, 2, { status: { kind: "freeze", frames: 50 }, hitstop: 6 }), sprite: "#blizzard" }],
@@ -611,6 +798,7 @@ export const ROSTER: CharacterDef[] = [
     look: "pingpong",
     stage: "muraille",
     stats: stats(4.4, 17.5, 0.98, 1.0),
+    style: "zoner",
     rating: { power: 3, speed: 4, range: 4, difficulty: 4 },
     moves: {
       sN: projectileMove(
@@ -629,12 +817,22 @@ export const ROSTER: CharacterDef[] = [
         wall: { frame: 14, x: 95, w: 50, h: 130, life: 320, hp: 5, sprite: "#wall-china" },
         meterGain: 50,
       },
-      sU: upperMove("Danse du Dragon", "Un dragon de papier l'emporte vers le ciel.", { fx: "dragon" }),
+      sU: {
+        name: "Smash Diplomatique",
+        desc: "Coup de raquette : renvoie les projectiles adverses et frappe vers le haut.",
+        frames: 40,
+        pose: "slap",
+        reflect: [3, 22],
+        fx: "dragon",
+        shout: "Smash !",
+        hitboxes: [{ x: 50, y: 160, w: 80, h: 120, from: 8, to: 14, hit: hit(75, 24, 16, 5, { launch: 10, knockdown: true }) }],
+        meterGain: 50,
+      },
       super: {
         name: "Crédit Social",
         desc: "Un scanner traverse l'écran : vide la jauge de super adverse et sonne.",
         frames: 84,
-        pose: "decree",
+        pose: "conduct",
         invuln: [0, 28],
         shout: "Crédit social : zéro.",
         projectiles: [{ frame: 18, x: 60, y: 120, vx: 11, w: 120, h: 220, life: 100, hits: 3, pierce: true, hit: hit(85, 26, 12, 3, { meterDrain: 400, status: { kind: "stun", frames: 40 }, hitstop: 8 }), sprite: "#scan" }],
@@ -667,10 +865,21 @@ export const ROSTER: CharacterDef[] = [
     look: "merguez",
     stage: "bruxelles",
     stats: stats(3.9, 17, 0.96, 1.0, 1040),
+    style: "allround",
     rating: { power: 3, speed: 3, range: 4, difficulty: 3 },
+    tweak: { fH: { name: "Coup de Sac à Main", pose: "slap" } },
     moves: {
       sN: projectileMove("Wir Schaffen Das", "Une bulle de discours calme et implacable.", shot("#text:WIR SCHAFFEN DAS", { vx: 7, w: 150, h: 34, hit: hit(66, 22, 16, 5) }), { shout: "Wir schaffen das !" }),
-      sF: dashMove("Austérité", "Coupe budgétaire aux ciseaux : vide une partie de la jauge adverse.", { fx: "scissors", shout: "Austérité !" }, { damage: 75, meterDrain: 300 }),
+      sF: dashMove("Austérité", "Coupe budgétaire aux ciseaux : vide une partie de la jauge adverse. Spécial pendant la ruée : la règle d'or.", { fx: "scissors", shout: "Austérité !", chain: { to: "f1", from: 12, until: 30 } }, { damage: 75, meterDrain: 300 }),
+      f1: {
+        name: "Règle d'Or",
+        desc: "Suite : un second coup de ciseaux qui coupe encore la jauge.",
+        frames: 36,
+        pose: "chop",
+        fx: "scissors",
+        hitboxes: [{ x: 60, y: 130, w: 70, h: 80, from: 10, to: 13, hit: hit(60, 22, 14, 6, { meterDrain: 200, knockdown: true }) }],
+        meterGain: 30,
+      },
       sD: {
         name: "Le Losange",
         desc: "La garde légendaire : contre-attaque si elle est frappée pendant la pose.",
@@ -686,7 +895,7 @@ export const ROSTER: CharacterDef[] = [
         name: "Moteur Franco-Allemand",
         desc: "Une locomotive traverse l'écran. Ponctuelle, évidemment.",
         frames: 88,
-        pose: "decree",
+        pose: "raute",
         invuln: [0, 28],
         shout: "Pünktlich !",
         projectiles: [{ frame: 20, origin: "screenBack", x: 0, y: 80, vx: 12, w: 220, h: 150, life: 140, hits: 4, pierce: true, hit: hit(72, 24, 12, 4, { hitstop: 7, knockdown: true }), sprite: "@train", size: 150 }],
@@ -709,6 +918,9 @@ export const ROSTER: CharacterDef[] = [
     quotes: ["Wir schaffen das. Vous, non.", "Ce K.O. respecte les critères de Maastricht.", "Austérité pour votre barre de vie."],
   }),
 ];
+
+/** Indices are stable: the second wave is appended after the original twelve. */
+export const ROSTER: CharacterDef[] = [...CLASSIC, ...NEW_CAST];
 
 export const charIndex = (id: string) => ROSTER.findIndex((c) => c.id === id);
 

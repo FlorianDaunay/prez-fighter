@@ -47,10 +47,10 @@ export function TitleScreen() {
   return (
     <Backdrop color="#d7262e">
       <div className="h-full flex flex-col items-center justify-center gap-8 p-6 cursor-pointer" onClick={() => go("menu")}>
-        <div className="flex gap-1 opacity-90">
+        <div className="flex flex-wrap justify-center gap-1 opacity-90 max-w-5xl">
           {ROSTER.slice(0, half).map((c, i) => (
             <div key={c.id} className="anim-float" style={{ animationDelay: `${i * 0.15}s` }}>
-              <Portrait look={c.look} size={88} />
+              <Portrait look={c.look} size={70} />
             </div>
           ))}
         </div>
@@ -59,10 +59,10 @@ export function TitleScreen() {
           <h1 className="logo text-6xl md:text-8xl -mt-2">FIGHTER</h1>
           <p className="mt-6 font-arcade text-lg md:text-xl text-white stroke-text">Le Tournoi de l'Élysée</p>
         </div>
-        <div className="flex gap-1 opacity-90">
+        <div className="flex flex-wrap justify-center gap-1 opacity-90 max-w-5xl">
           {ROSTER.slice(half).map((c, i) => (
             <div key={c.id} className="anim-float" style={{ animationDelay: `${i * 0.15 + 0.4}s` }}>
-              <Portrait look={c.look} size={88} flip />
+              <Portrait look={c.look} size={70} flip />
             </div>
           ))}
         </div>
@@ -97,17 +97,17 @@ export function MainMenu() {
                 { label: "Entraînement", icon: "glove", desc: "Vie et jauge infinies, mannequin immobile. Pour réviser ses combos.", onSelect: () => start("training") },
                 { label: "Personnages", icon: "scroll", desc: "Le casting, son lore (très) caricatural et la liste des coups avec aperçus animés.", onSelect: () => go("roster") },
                 { label: "Commandes", icon: "joystick", desc: `Clavier et manettes, tout est remappable. ${pads ? `${pads} manette(s) détectée(s).` : "Aucune manette détectée : appuie sur un bouton de la manette."}`, onSelect: () => go("controls") },
-                { label: "Options", icon: "gear", desc: "Son, annonceur, durée des rounds, difficulté, thème.", onSelect: () => go("options") },
+                { label: "Options", icon: "gear", desc: "Son, durée des rounds, difficulté, thème.", onSelect: () => go("options") },
                 { label: "Mentions", icon: "info", desc: "Avertissement, crédits et informations.", onSelect: () => go("credits") },
               ]}
             />
           </div>
         </div>
         <div className="hidden md:flex justify-center">
-          <div className="grid grid-cols-4 gap-2 rotate-3 opacity-80">
+          <div className="grid grid-cols-5 gap-2 rotate-3 opacity-80">
             {ROSTER.map((c, i) => (
               <div key={c.id} className="anim-float rounded-tile overflow-hidden border-2 border-black/50" style={{ background: c.color, animationDelay: `${i * 0.1}s` }}>
-                <Portrait look={c.look} size={110} flip={i % 2 === 1} />
+                <Portrait look={c.look} size={84} flip={i % 2 === 1} />
               </div>
             ))}
           </div>

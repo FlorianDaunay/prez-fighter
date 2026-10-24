@@ -584,6 +584,8 @@ export const FX_SPRITE: Record<string, string> = {
   diamond: "diamond",
   flex: "muscle",
   silk: "ribbon",
+  ribbon: "ribbon",
+  lion: "lion",
   speed: "puff",
   lightning: "lightning",
   podium: "mic",

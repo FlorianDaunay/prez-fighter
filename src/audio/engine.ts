@@ -225,17 +225,3 @@ export function sfx(kind: Sfx, pan = 0) {
   }
 }
 
-// ---------------------------------------------------------------- announcer
-
-export function announce(text: string) {
-  if (!useSettings.getState().announcer || !("speechSynthesis" in window)) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "fr-FR";
-  u.rate = 1.05;
-  u.pitch = 0.7;
-  u.volume = Math.min(1, useSettings.getState().sfx + 0.2);
-  const voice = speechSynthesis.getVoices().find((v) => v.lang.startsWith("fr"));
-  if (voice) u.voice = voice;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}

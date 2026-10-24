@@ -835,6 +835,213 @@ const SPRITES: Record<string, (c: Ctx, s: number) => void> = {
       c.closePath();
     }, 1.5);
   },
+  uniform(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    shape(c, "#1d2c57", () => {
+      c.moveTo(-8, -16);
+      c.lineTo(-20, -8);
+      c.lineTo(-15, 0);
+      c.lineTo(-11, -3);
+      c.lineTo(-11, 16);
+      c.lineTo(11, 16);
+      c.lineTo(11, -3);
+      c.lineTo(15, 0);
+      c.lineTo(20, -8);
+      c.lineTo(8, -16);
+      c.closePath();
+    });
+    shape(c, "#ffffff", () => {
+      c.moveTo(-6, -16);
+      c.lineTo(0, -6);
+      c.lineTo(6, -16);
+      c.closePath();
+    }, 1.2);
+    shape(c, "#c8102e", () => c.rect(-1.5, -10, 3, 12), 0);
+    shape(c, "#f2c230", () => c.arc(-6, 2, 2.5, 0, Math.PI * 2), 1);
+  },
+  horse(c, s) {
+    const u = s / 80;
+    c.scale(u, u);
+    const brown = "#8a5a32";
+    for (const [x, a] of [[-24, 0.3], [-14, -0.3], [18, 0.25], [28, -0.25]] as const) {
+      c.save();
+      c.translate(x, 8);
+      c.rotate(a);
+      shape(c, brown, () => c.rect(-3, 0, 6, 26), 1.5);
+      c.restore();
+    }
+    shape(c, brown, () => c.ellipse(0, 0, 34, 15, 0, 0, Math.PI * 2));
+    shape(c, brown, () => {
+      c.moveTo(24, -6);
+      c.lineTo(36, -30);
+      c.lineTo(50, -24);
+      c.lineTo(46, -16);
+      c.lineTo(36, -16);
+      c.lineTo(32, 2);
+      c.closePath();
+    });
+    c.fillStyle = "#2a1a10";
+    c.beginPath();
+    c.moveTo(24, -10);
+    c.quadraticCurveTo(28, -30, 38, -32);
+    c.lineTo(32, -12);
+    c.fill();
+    c.beginPath();
+    c.moveTo(-34, -4);
+    c.quadraticCurveTo(-48, 0, -44, 18);
+    c.quadraticCurveTo(-40, 6, -32, 4);
+    c.fill();
+    c.fillStyle = OUT;
+    c.beginPath();
+    c.arc(42, -24, 1.8, 0, Math.PI * 2);
+    c.fill();
+  },
+  wrench(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    c.rotate(-0.7);
+    shape(c, "#b8c0c8", () => c.roundRect(-3.5, -6, 7, 26, 3), 1.5);
+    shape(c, "#b8c0c8", () => {
+      c.arc(0, -11, 9, 0, Math.PI * 2);
+    });
+    shape(c, "#5a6670", () => c.rect(-3.5, -22, 7, 11), 0);
+  },
+  sheep(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    c.fillStyle = OUT;
+    for (const x of [-9, -3, 5, 11]) c.fillRect(x, 6, 3, 10);
+    shape(c, "#f6f3ea", () => {
+      for (const [x, y, r] of [[-8, 0, 8], [0, -4, 9], [8, 0, 8], [0, 4, 9], [-12, 4, 6], [12, 4, 6]]) {
+        c.moveTo(x + r, y);
+        c.arc(x, y, r, 0, Math.PI * 2);
+      }
+    }, 1.5);
+    shape(c, "#2a2420", () => c.ellipse(16, -2, 6, 5, 0.3, 0, Math.PI * 2), 1.2);
+    c.fillStyle = "#fff";
+    c.beginPath();
+    c.arc(18, -3, 1.4, 0, Math.PI * 2);
+    c.fill();
+  },
+  bus(c, s) {
+    const u = s / 80;
+    c.scale(u, u);
+    shape(c, "#d7262e", () => c.roundRect(-38, -28, 76, 52, 6), 2.5);
+    c.fillStyle = "#cfe6f5";
+    for (let i = 0; i < 4; i++) {
+      c.fillRect(-32 + i * 17, -23, 13, 11);
+      c.fillRect(-32 + i * 17, -6, 13, 11);
+    }
+    c.fillStyle = "#fff";
+    c.font = "8px Bungee, Impact, sans-serif";
+    c.textAlign = "center";
+    c.fillText("£350M", 0, 18);
+    c.fillStyle = OUT;
+    for (const x of [-24, 24]) {
+      c.beginPath();
+      c.arc(x, 25, 7, 0, Math.PI * 2);
+      c.fill();
+    }
+  },
+  dog(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    const fur = "#c9a26b";
+    c.fillStyle = OUT;
+    for (const x of [-12, -6, 6, 12]) c.fillRect(x, 6, 4, 11);
+    shape(c, fur, () => c.ellipse(-2, 2, 16, 9, 0, 0, Math.PI * 2));
+    shape(c, fur, () => c.ellipse(14, -8, 9, 8, 0, 0, Math.PI * 2));
+    shape(c, "#3a2a1a", () => c.ellipse(9, -12, 4, 7, 0.4, 0, Math.PI * 2), 1.2);
+    shape(c, "#e0c090", () => c.ellipse(20, -5, 5, 4, 0, 0, Math.PI * 2), 1.2);
+    c.fillStyle = OUT;
+    c.beginPath();
+    c.arc(23, -6, 1.8, 0, Math.PI * 2);
+    c.arc(15, -10, 1.5, 0, Math.PI * 2);
+    c.fill();
+    c.strokeStyle = fur;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(-17, 0);
+    c.quadraticCurveTo(-24, -6, -22, -12);
+    c.stroke();
+  },
+  cat(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    const fur = "#3a3a3a";
+    c.strokeStyle = fur;
+    c.lineWidth = 3;
+    c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(-14, 8);
+    c.quadraticCurveTo(-24, 4, -20, -10);
+    c.stroke();
+    shape(c, "#f4f4f4", () => c.ellipse(-2, 6, 13, 9, 0, 0, Math.PI * 2));
+    shape(c, fur, () => c.ellipse(-4, 3, 11, 7, 0, 0, Math.PI * 2), 0);
+    shape(c, fur, () => {
+      c.arc(10, -6, 8, 0, Math.PI * 2);
+      c.moveTo(4, -11);
+      c.lineTo(5, -19);
+      c.lineTo(10, -13);
+      c.moveTo(12, -13);
+      c.lineTo(17, -19);
+      c.lineTo(17, -10);
+    });
+    shape(c, "#f4f4f4", () => c.ellipse(12, -3, 4, 3, 0, 0, Math.PI * 2), 0);
+    c.fillStyle = "#9fd34a";
+    c.beginPath();
+    c.arc(8, -7, 1.6, 0, Math.PI * 2);
+    c.arc(14, -7, 1.6, 0, Math.PI * 2);
+    c.fill();
+  },
+  basketball(c, s) {
+    shape(c, "#f07a1a", () => c.arc(0, 0, s * 0.42, 0, Math.PI * 2), 1.5);
+    c.strokeStyle = OUT;
+    c.lineWidth = Math.max(1, s * 0.04);
+    c.beginPath();
+    c.moveTo(-s * 0.42, 0);
+    c.lineTo(s * 0.42, 0);
+    c.moveTo(0, -s * 0.42);
+    c.lineTo(0, s * 0.42);
+    c.arc(-s * 0.55, 0, s * 0.32, -0.9, 0.9);
+    c.moveTo(s * 0.55 - s * 0.32 * Math.cos(0.9), -s * 0.32 * Math.sin(0.9));
+    c.arc(s * 0.55, 0, s * 0.32, Math.PI - 0.9, Math.PI + 0.9, true);
+    c.stroke();
+  },
+  column(c, s) {
+    const u = s / 80;
+    c.scale(u, u);
+    shape(c, "#ece6d6", () => c.rect(-22, -34, 44, 8), 2);
+    shape(c, "#ece6d6", () => c.rect(-16, -26, 32, 54), 2);
+    shape(c, "#ece6d6", () => c.rect(-24, 28, 48, 8), 2);
+    c.strokeStyle = "rgba(0,0,0,0.25)";
+    c.lineWidth = 2;
+    for (const x of [-8, 0, 8]) {
+      c.beginPath();
+      c.moveTo(x, -24);
+      c.lineTo(x, 26);
+      c.stroke();
+    }
+  },
+  lion(c, s) {
+    const u = s / 40;
+    c.scale(u, u);
+    shape(c, "#b8691a", () => star(c, 17, 0.75, 12), 1.5);
+    shape(c, "#f2b632", () => c.arc(0, 1, 10, 0, Math.PI * 2), 1.5);
+    c.fillStyle = OUT;
+    for (const x of [-4, 4]) {
+      c.beginPath();
+      c.arc(x, -2, 1.6, 0, Math.PI * 2);
+      c.fill();
+    }
+    shape(c, "#5a2a10", () => {
+      c.moveTo(-3, 3);
+      c.lineTo(3, 3);
+      c.lineTo(0, 6);
+      c.closePath();
+    }, 0);
+  },
   // Menu icons
   trophy(c, s) {
     const u = s / 40;

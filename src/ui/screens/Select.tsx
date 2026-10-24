@@ -12,7 +12,24 @@ import { useApp } from "../store";
 import { useMenu } from "../useMenu";
 import { MoveListModal } from "./MoveList";
 
-const COLS = 4;
+const COLS = 9;
+
+const chunk = (list: number[]) => Array.from({ length: Math.ceil(list.length / COLS) }, (_, r) => list.slice(r * COLS, r * COLS + COLS));
+const indices = ROSTER.map((_, i) => i);
+const GRID_FR = chunk(indices.filter((i) => ROSTER[i].origin === "fr"));
+const GRID_INTL = chunk(indices.filter((i) => ROSTER[i].origin === "intl"));
+/** Rows of roster indices as shown on screen: French candidates first, then the guests. */
+const GRID = [...GRID_FR, ...GRID_INTL];
+const ORDER = GRID.flat();
+
+/** Cursor movement on the grid (rows may be shorter than COLS). */
+function stepGrid(cur: number, dx: number, dy: number): number {
+  if (dx) return ORDER[(ORDER.indexOf(cur) + dx + ORDER.length) % ORDER.length];
+  const r = GRID.findIndex((row) => row.includes(cur));
+  const c = GRID[r].indexOf(cur);
+  const nr = (r + dy + GRID.length) % GRID.length;
+  return GRID[nr][Math.min(c, GRID[nr].length - 1)];
+}
 
 /** Small animated full-body figure. */
 export function Figure({ char, flip = false, className = "" }: { char: number; flip?: boolean; className?: string }) {
@@ -120,17 +137,16 @@ export function CharSelect() {
       return;
     }
     if (locked[p]) return;
-    const move = (d: number) => {
-      const n = ROSTER.length;
+    const move = (dx: number, dy: number) => {
       const next = [...cursor] as [number, number];
-      next[p] = (cursor[p] + d + n) % n;
+      next[p] = stepGrid(cursor[p], dx, dy);
       setCursor(next);
       sfx("move");
     };
-    if (e.action === "left") move(-1);
-    else if (e.action === "right") move(1);
-    else if (e.action === "up") move(-COLS);
-    else if (e.action === "down") move(COLS);
+    if (e.action === "left") move(-1, 0);
+    else if (e.action === "right") move(1, 0);
+    else if (e.action === "up") move(0, -1);
+    else if (e.action === "down") move(0, 1);
     else if (e.action === "extra") {
       setMoves(cursor[p]);
       sfx("select");
@@ -182,19 +198,19 @@ export function CharSelect() {
         <div className={`grid gap-4 min-h-0 ${showP2 ? "grid-cols-[1fr_minmax(0,1.5fr)_1fr]" : "grid-cols-[1fr_minmax(0,1.5fr)]"}`}>
           <Info char={cursor[0]} side={0} locked={locked[0]} label={sideLabel(0)} />
           <div className="flex flex-col justify-center gap-2 min-h-0">
-            {[0, 1, 2].map((row) => (
-              <div key={row}>
-                {row === 2 && <p className="font-arcade text-xs text-accent mb-1 text-center">— Invités internationaux —</p>}
-                {row === 0 && <p className="font-arcade text-xs text-text-secondary mb-1 text-center">— Candidats français —</p>}
-                <div className="grid grid-cols-4 gap-2">
-                  {ROSTER.slice(row * COLS, row * COLS + COLS).map((c, k) => {
-                    const i = row * COLS + k;
+            {GRID.map((row, r) => (
+              <div key={r}>
+                {r === GRID_FR.length && <p className="font-arcade text-xs text-accent mb-1 text-center">— Invités internationaux —</p>}
+                {r === 0 && <p className="font-arcade text-xs text-text-secondary mb-1 text-center">— Candidats français —</p>}
+                <div className="grid grid-cols-9 gap-1.5">
+                  {row.map((i) => {
+                    const c = ROSTER[i];
                     const p1 = cursor[0] === i;
                     const p2 = showP2 && cursor[1] === i && (locked[0] || mode === "versus");
                     return (
                       <div key={c.id} className={`tile ${p1 ? "p1" : ""} ${p2 ? "p2" : ""}`} style={{ background: `linear-gradient(160deg, ${c.color}, #111)` }} onClick={() => tileClick(i)}>
                         <Portrait look={c.look} size={160} className="w-full h-auto block" />
-                        <div className="absolute bottom-0 inset-x-0 bg-black/70 text-[10px] md:text-xs font-arcade text-center truncate px-1">{shortName(i)}</div>
+                        <div className="absolute bottom-0 inset-x-0 bg-black/70 text-[8px] md:text-[10px] font-arcade text-center truncate px-0.5">{shortName(i)}</div>
                         {COUNTRY[c.id] && <Flag country={COUNTRY[c.id]} className="absolute top-1 right-1" />}
                         {p1 && <span className="absolute top-0 left-0 bg-[#ff3b3b] text-[10px] font-arcade px-1">J1</span>}
                         {p2 && <span className="absolute top-0 left-6 bg-[#3b8bff] text-[10px] font-arcade px-1">{mode === "versus" ? "J2" : "CPU"}</span>}

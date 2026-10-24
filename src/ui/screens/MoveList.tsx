@@ -11,19 +11,25 @@ type Entry = { slot: MoveSlot | "support"; name: string; input: string; desc: st
 export function moveEntries(char: number): Entry[] {
   const c = ROSTER[char];
   const out: Entry[] = [];
-  const add = (slot: MoveSlot, kind: string) => {
+  const add = (slot: MoveSlot, kind: string, input = SLOT_INPUT[slot]) => {
     const m = c.moves[slot];
-    if (m) out.push({ slot, name: m.name, input: SLOT_INPUT[slot], desc: m.desc ?? "", kind });
+    if (m) out.push({ slot, name: m.name, input, desc: m.desc ?? "", kind });
   };
-  (["sN", "sF", "sD", "sU"] as MoveSlot[]).forEach((s) => add(s, "Spécial"));
+  (["sN", "sF", "sD", "sU", "jS"] as MoveSlot[]).forEach((s) => {
+    add(s, "Spécial");
+    // Follow-ups right under the move they come from.
+    for (let ch = c.moves[s]?.chain, depth = 1; ch && depth < 4; ch = c.moves[ch.to]?.chain, depth++) {
+      add(ch.to, "Suite", `${"↳ ".repeat(depth)}Spécial${ch.onHit ? " (si touché)" : ""}`);
+    }
+  });
   add("super", "Super");
   out.push({ slot: "support", name: c.support.name, input: "Soutien", desc: c.support.desc, kind: "Soutien" });
   add("throw", "Base");
-  (["L", "H", "cL", "cH", "jL", "jH"] as MoveSlot[]).forEach((s) => add(s, "Base"));
+  (["L", "H", "fH", "cL", "cH", "jL", "jH"] as MoveSlot[]).forEach((s) => add(s, "Base"));
   return out;
 }
 
-const KIND_COLOR: Record<string, string> = { Spécial: "#ffcc1a", Super: "#5ef0ff", Soutien: "#ff7ad9", Base: "#9093c9" };
+const KIND_COLOR: Record<string, string> = { Spécial: "#ffcc1a", Suite: "#ffa04a", Super: "#5ef0ff", Soutien: "#ff7ad9", Base: "#9093c9" };
 
 /** Full-screen move list with an animated preview of the selected move. */
 export function MoveListModal({ char, onClose }: { char: number; onClose: () => void }) {

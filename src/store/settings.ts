@@ -10,7 +10,6 @@ export interface Settings {
   sources: [DeviceId[], DeviceId[]];
   music: number;
   sfx: number;
-  announcer: boolean;
   cpuLevel: number;
   rounds: number;
   time: number;
@@ -35,7 +34,6 @@ export const useSettings = create<Settings>()(
       sources: [["kbA", "pad0"], ["kbB", "pad1"]],
       music: 0.6,
       sfx: 0.8,
-      announcer: true,
       cpuLevel: 1,
       rounds: 2,
       time: 99,

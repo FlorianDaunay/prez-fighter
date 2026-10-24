@@ -21,14 +21,16 @@ Jeu de combat 2D parodique dans le navigateur : des caricatures de politiciens f
 | Projection (Léger+Lourd) | V | P | L/ZL |
 | Pause | Échap | Retour arrière | + / Start |
 
-Spéciaux : **Spécial**, **→ + Spécial**, **↓ + Spécial**, **↑ + Spécial** ; **Super** quand la jauge bleue est pleine. Garde : maintenir la direction opposée à l'adversaire (en bas pour les coups bas). Les coups de base qui touchent s'annulent en spécial ou en super.
+Spéciaux : **Spécial**, **→ + Spécial**, **↓ + Spécial**, **↑ + Spécial**, **Spécial en l'air** ; certains s'enchaînent en réappuyant sur **Spécial** (↳ dans la liste des coups). **→ + Lourd** : coup de commande propre à chaque perso. **Super** quand la jauge bleue est pleine. Garde : maintenir la direction opposée à l'adversaire (en bas pour les coups bas). Les coups de base qui touchent s'annulent en spécial ou en super.
 
 Tout se remappe dans **Commandes** (capture touche/bouton/axe), y compris l'attribution des appareils à chaque joueur. Manette Switch Pro en USB : reconnue en disposition standard sous Chrome/Edge (A valide, B revient dans les menus).
 
 ## Le casting
 
-Candidats français : Emmanuel Macaron, Marine Le Pain, Jean-Luc Méluchon, Nicolas Sarkozix, François Hollandaise, Jacques Chirashi, Charles de Gaufre, Ségolène Royaume.
-Invités internationaux : Donald Trompe (+ Elon Mousse), Vladimir Poutrine (+ l'Usine à Trolls), Xi Pingpong (+ les Pandas Diplomatiques), Angela Merguez (+ Ursula von der Lait).
+25 combattants, chacun avec son style (polyvalent, boxeur, bagarreur, lutteur, zoneur, rushdown), son arène et sa musique.
+
+Candidats français : Emmanuel Macaron, Marine Le Pain, Jean-Luc Méluchon, Nicolas Sarkozix, François Hollandaise, Jacques Chirashi, Charles de Gaufre, Ségolène Royaume, Édouard Philippâte, Gabriel Atable, François Bayonne, Jordan Mortadella, David Lasagnard, Éric Zemmoussaka, Philippe Poutoufeu, Jean Lassalade, Raphaël Glucosmann.
+Invités internationaux : Donald Trompe (+ Elon Mousse), Vladimir Poutrine (+ l'Usine à Trolls), Xi Pingpong (+ les Pandas Diplomatiques), Angela Merguez (+ Ursula von der Lait), Javier Milanesa (+ les Clones de Conan), Boris Johnsoup (+ Larry le Chat), Giorgia Mellone (+ les Carabinieri), Kim Jong-Nem (+ l'Ami Basketteur).
 
 Lore, soutiens et liste des coups avec aperçus animés : menu **Personnages**.
 

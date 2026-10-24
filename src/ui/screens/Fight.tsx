@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { announce, playMusic, sfx } from "@/audio/engine";
+import { playMusic, sfx } from "@/audio/engine";
 import { ROSTER, shortName } from "@/core/roster";
 import { STAGES, stageIndex } from "@/core/stages";
 import { setMenuEnabled } from "@/input/manager";
@@ -214,8 +214,6 @@ export function Results() {
   const quote = useMemo(() => (winner ? winner.quotes[Math.floor(Math.random() * winner.quotes.length)] : ""), [winner]);
   useEffect(() => {
     playMusic("select");
-    if (winner) announce(`Victoire de ${winner.name}`);
-    else announce("Match nul");
   }, [winner]);
 
   let items: { label: string; onSelect: () => void; desc?: string }[] = [];
@@ -312,7 +310,6 @@ export function ArcadeEnd() {
   useEffect(() => {
     playMusic("title");
     sfx("perfect");
-    announce(`${c.name}, président du tournoi !`);
   }, [c]);
   const endings: Record<string, string> = {
     macaron: "Réélu par 49.3 voix contre 0, il décrète la start-up nation obligatoire. Sa première loi : le K.O. devient une compétence transversale.",
@@ -327,6 +324,19 @@ export function ArcadeEnd() {
     poutrine: "Les résultats officiels lui donnent 146 % des voix. Il fête ça torse nu sur un ours, au sommet de la tour Eiffel.",
     pingpong: "Il rachète le tournoi, puis le pays organisateur, puis le concept de tournoi. Le trophée est désormais fabriqué à Shenzhen.",
     merguez: "Elle signe calmement le traité de paix, range la coupe dans son sac à main et repart en Thalys. Ponctuelle.",
+    philippate: "Il range ses gants, limite le cortège de la victoire à 80 km/h et retourne au Havre écrire un livre sur l'art de garder la garde.",
+    atable: "Nommé président du tournoi, il démissionne aussitôt pour battre son propre record de précocité. Puis revient. Puis repart.",
+    bayonne: "Après quarante ans d'attente, il remporte enfin le titre. Il prend le temps de savourer. Il le savoure encore.",
+    mortadella: "Sa vidéo de victoire atteint 40 millions de vues. Le trophée, lui, n'est jamais sorti du champ de la caméra.",
+    lisnard: "Il remet la coupe à lui-même sur le tapis rouge, sous les flashes, puis supprime trois formulaires pour fêter ça.",
+    zemmour: "Il annonce sa victoire, puis la conteste, puis écrit un livre de 600 pages pour expliquer qu'il l'avait prévue.",
+    poutou: "Il redistribue le trophée en pièces détachées aux camarades de l'usine et repart en t-shirt, comme il était venu.",
+    lassalle: "Il rentre à pied dans les Pyrénées avec la coupe, en chantant. Il arrive trois mois plus tard. Les brebis l'attendaient.",
+    glucksmann: "Il dédie sa victoire à l'Europe, cite Spinoza dans son discours et n'a toujours pas un cheveu de travers.",
+    milanesa: "Il tronçonne le trophée en deux pour « réduire les dépenses », puis vend la moitié aux enchères. Ses chiens approuvent.",
+    johnsoup: "Il organise une fête de victoire « strictement professionnelle », se coince sur une tyrolienne et brandit la coupe la tête en bas.",
+    mellone: "Elle fête sa victoire avec un remix techno de son discours, numéro un des ventes de Rome à Palerme.",
+    kimjongnem: "La victoire est annoncée avec 100,0 % des voix et un défilé de trois jours. Applaudir est obligatoire.",
   };
   return (
     <Backdrop color={c.color}>

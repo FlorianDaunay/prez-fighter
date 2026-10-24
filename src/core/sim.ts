@@ -258,11 +258,16 @@ function startMove(s: GameState, p: number, slot: MoveSlot) {
   if (slot !== "super") f.meter = Math.min(METER_MAX, f.meter + (def.meterGain ?? 0));
   setShout(f, def.shout);
   if (def.selfStatus) addStatus(f, def.selfStatus);
+  if (def.heal) {
+    f.hp = Math.min(charOf(f).stats.hp, f.hp + def.heal);
+    emit(s, { type: "status", p, x: f.x, y: f.y + 180, s: "heal" });
+  }
   emit(s, { type: "whiff", p, x: f.x, y: f.y, s: slot });
   return true;
 }
 
 function specialSlot(f: Fighter, input: number): MoveSlot {
+  if (!grounded(f) && charOf(f).moves.jS) return "jS";
   const fwd = f.facing === 1 ? BTN.RIGHT : BTN.LEFT;
   if (has(input, BTN.UP)) return "sU";
   if (has(input, BTN.DOWN)) return "sD";
@@ -270,7 +275,7 @@ function specialSlot(f: Fighter, input: number): MoveSlot {
   return "sN";
 }
 
-const NORMALS: MoveSlot[] = ["L", "H", "cL", "cH", "jL", "jH"];
+const NORMALS: MoveSlot[] = ["L", "H", "fH", "cL", "cH", "jL", "jH"];
 
 /** Reads buffered buttons and starts an action if allowed. Returns true if something started. */
 function tryActions(s: GameState, p: number, input: number): boolean {
@@ -305,6 +310,12 @@ function tryActions(s: GameState, p: number, input: number): boolean {
     emit(s, { type: "super", p, x: f.x, y: f.y, s: moves.super.name });
     return true;
   }
+  const cur = inMove ? moveOf(f) : undefined;
+  const chain = cur?.chain;
+  if (chain && has(b, BTN.SPECIAL) && f.moveFrame >= chain.from && f.moveFrame <= chain.until && (!chain.onHit || f.moveHit) && moves[chain.to]) {
+    consume();
+    return startMove(s, p, chain.to);
+  }
   if (has(b, BTN.SPECIAL) && (free || cancelSpecial)) {
     const slot = specialSlot(f, input);
     const def = moves[slot];
@@ -315,13 +326,14 @@ function tryActions(s: GameState, p: number, input: number): boolean {
   }
   if (!free && !cancelChain) return false;
   const lightHeavy = (has(b, BTN.LIGHT) && (has(b, BTN.HEAVY) || has(input, BTN.HEAVY))) || (has(b, BTN.HEAVY) && has(input, BTN.LIGHT));
-  if (lightHeavy && !air && free && grounded(opp) && !isDown(opp) && Math.abs(opp.x - f.x) < 95 * charOf(f).stats.size) {
+  if (lightHeavy && !air && free && grounded(opp) && !isDown(opp) && Math.abs(opp.x - f.x) < (charOf(f).style === "grappler" ? 125 : 95) * charOf(f).stats.size) {
     consume();
     return startMove(s, p, "throw");
   }
   if (has(b, BTN.HEAVY)) {
     consume();
-    return startMove(s, p, air ? "jH" : has(input, BTN.DOWN) ? "cH" : "H");
+    const fwd = f.facing === 1 ? BTN.RIGHT : BTN.LEFT;
+    return startMove(s, p, air ? "jH" : has(input, BTN.DOWN) ? "cH" : has(input, fwd) && moves.fH ? "fH" : "H");
   }
   if (has(b, BTN.LIGHT) && free) {
     consume();
@@ -380,6 +392,16 @@ function runMove(s: GameState, p: number) {
       if (m.vy !== undefined && mf === m.from) f.vy = m.vy;
     }
     if (!moving && grounded(f)) f.vx = 0;
+  }
+  if (def.teleport === mf) {
+    // Reappear just behind the opponent, facing them; in front if a wall is in the way.
+    const opp = s.fighters[1 - p];
+    const side = sign(opp.x - f.x);
+    let x = opp.x + side * 75;
+    if (x < WALL_MARGIN || x > STAGE_W - WALL_MARGIN) x = opp.x - side * 75;
+    emit(s, { type: "clash", p, x: f.x, y: f.y + 110 });
+    f.x = Math.min(STAGE_W - WALL_MARGIN, Math.max(WALL_MARGIN, x));
+    f.facing = sign(opp.x - f.x);
   }
   spawnProjectilesAt(s, p, def.projectiles, mf, f.x, f.y, f.facing);
   if (def.wall && mf === def.wall.frame) spawnWall(s, p, def.wall, f.x, f.facing);
@@ -487,7 +509,8 @@ function applyAttack(s: GameState, victimIdx: number, atk: Attack, at: { x: numb
   // Clean hit
   const scale = Math.max(0.35, 1 - 0.1 * v.combo);
   const taxed = (v.status.taxed ?? 0) > 0 ? 1.3 : 1;
-  const dmg = Math.max(1, Math.round(h.damage * scale * taxed));
+  const rage = (a.status.rage ?? 0) > 0 ? 1.25 : 1;
+  const dmg = Math.max(1, Math.round(h.damage * scale * taxed * rage));
   v.hp -= dmg;
   if (s.config.training) v.hp = Math.max(1, v.hp);
   v.combo++;
@@ -497,6 +520,7 @@ function applyAttack(s: GameState, victimIdx: number, atk: Attack, at: { x: numb
   a.meter = Math.min(METER_MAX, a.meter + (atk.isSuper ? 0 : Math.floor(dmg * 0.5)));
   v.meter = Math.min(METER_MAX, v.meter + Math.floor(dmg * 0.35));
   if (h.meterDrain) v.meter = Math.max(0, v.meter - h.meterDrain);
+  if (h.steal && a.hp > 0) a.hp = Math.min(charOf(a).stats.hp, a.hp + Math.round(dmg * h.steal));
   if (h.status) {
     addStatus(v, h.status);
     emit(s, { type: "status", p: victimIdx, x: v.x, y: v.y + 180, s: h.status.kind });
@@ -634,6 +658,17 @@ function updateProjectiles(s: GameState) {
     const vb = hurtbox(victim);
     const r = projRect(pr);
     if (!overlap(r, vb)) continue;
+    const vm = victim.state === "attack" ? moveOf(victim) : undefined;
+    if (vm && inWindow(vm.reflect, victim.moveFrame) && sign(pr.x - victim.x) === victim.facing) {
+      pr.owner = victimIdx;
+      pr.vx = pr.vx === 0 ? victim.facing * 9 : -pr.vx * 1.15;
+      if (pr.def.origin === "sky") pr.vy = 0;
+      pr.age = 0;
+      pr.lastHit = -99;
+      victim.moveHit = true;
+      emit(s, { type: "counter", p: victimIdx, x: pr.x, y: pr.y, s: "reflect" });
+      continue;
+    }
     const res = applyAttack(s, victimIdx, { attacker: pr.owner, hit: pr.def.hit, fromX: pr.vx !== 0 ? pr.x - pr.vx * 4 : s.fighters[pr.owner].x, isProjectile: true, isSuper: false, air: false }, { x: pr.x, y: Math.min(r.y, vb.y + vb.h / 2) });
     if (res === "miss") continue;
     pr.lastHit = pr.age;
@@ -812,7 +847,8 @@ function tickFighter(s: GameState, p: number) {
   if (s.config.training) f.meter = METER_MAX;
 }
 
-function readInput(f: Fighter, raw: number): number {
+/** `aging` is off during hit freezes: a button pressed on impact must still count afterwards. */
+function readInput(f: Fighter, raw: number, aging = true): number {
   let input = cleanInput(raw);
   if ((f.status.reverse ?? 0) > 0) {
     const l = has(input, BTN.LEFT);
@@ -826,7 +862,7 @@ function readInput(f: Fighter, raw: number): number {
   if (pressed) {
     f.buffer |= pressed;
     f.bufferAge = 0;
-  } else if (f.buffer && ++f.bufferAge > BUFFER_FRAMES) {
+  } else if (f.buffer && aging && ++f.bufferAge > BUFFER_FRAMES) {
     f.buffer = 0;
     f.bufferAge = 0;
   }
@@ -929,7 +965,7 @@ export function step(s: GameState, inputs: readonly [number, number] | number[])
   }
   if (s.hitstop > 0) {
     s.hitstop--;
-    s.fighters.forEach((f, i) => readInput(f, inputs[i]));
+    s.fighters.forEach((f, i) => readInput(f, inputs[i], false));
     return;
   }
 

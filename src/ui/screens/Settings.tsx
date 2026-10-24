@@ -71,7 +71,6 @@ export function Options() {
   const rows: Row[] = [
     { label: "Musique", value: pct(s.music), change: (d) => s.set({ music: vol(s.music, d) }) },
     { label: "Effets sonores", value: pct(s.sfx), change: (d) => s.set({ sfx: vol(s.sfx, d) }) },
-    { label: "Annonceur (voix)", value: s.announcer ? "Oui" : "Non", change: () => s.set({ announcer: !s.announcer }), desc: "Utilise la synthèse vocale du navigateur." },
     { label: "Manches gagnantes", value: String(s.rounds), change: (d) => s.set({ rounds: cycle([1, 2, 3], s.rounds, d) }) },
     { label: "Durée d'un round", value: s.time ? `${s.time} s` : "Infinie", change: (d) => s.set({ time: cycle([30, 60, 99, 0], s.time, d) }) },
     { label: "Difficulté de l'ordi", value: AI_LEVELS[s.cpuLevel].name, change: (d) => s.set({ cpuLevel: cycle([0, 1, 2, 3], s.cpuLevel, d) }), desc: "Stagiaire, Député, Ministre ou Président." },

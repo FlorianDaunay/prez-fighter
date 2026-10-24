@@ -5,7 +5,11 @@
 import { METER_MAX } from "./constants";
 import { BTN } from "./input";
 import { ROSTER } from "./roster";
-import type { Fighter, GameState } from "./types";
+import type { Fighter, GameState, MoveSlot } from "./types";
+
+/** Input that starts each special slot, for a fighter facing `fwd`. */
+const specialInput = (slot: MoveSlot, fwd: number) =>
+  BTN.SPECIAL | (slot === "sF" ? fwd : slot === "sD" ? BTN.DOWN : slot === "sU" ? BTN.UP : 0);
 
 export const AI_LEVELS = [
   { name: "Stagiaire", reaction: 22, block: 0.2, aggression: 0.35, antiAir: 0.15, combo: 0.2 },
@@ -64,13 +68,17 @@ export class CpuBrain {
     // Defence reacts even in the middle of a plan.
     const threatened = (seen.state === "attack" && dist < 230) || seen.projectileClose;
     if (threatened && !busy && me.y === 0 && this.queue.length < 4) {
-      if (r() < this.level.block) {
+      const reflector = (["sU", "sD", "sN"] as MoveSlot[]).find((sl) => moves[sl]?.reflect);
+      if (seen.projectileClose && reflector && r() < this.level.block * 0.5) {
+        this.queue = [{ input: specialInput(reflector, fwd), frames: 1 }, { input: 0, frames: 24 }];
+      } else if (r() < this.level.block) {
         const low = seen.move === "cL" || seen.move === "cH";
         this.queue = [{ input: back | (low ? BTN.DOWN : 0), frames: 10 }];
       }
     }
     // Anti-air
-    if (seen.state === "jump" && seen.y > 30 && seen.vy < 4 && dist < 200 && !busy && this.queue.length === 0 && r() < this.level.antiAir * 0.25) {
+    const antiAir = !!(moves.sU?.hitboxes?.length || moves.sU?.projectiles?.length);
+    if (antiAir && seen.state === "jump" && seen.y > 30 && seen.vy < 4 && dist < 200 && !busy && this.queue.length === 0 && r() < this.level.antiAir * 0.25) {
       this.push({ input: BTN.UP | BTN.SPECIAL, frames: 1 }, { input: 0, frames: 30 });
     }
 
@@ -97,6 +105,12 @@ export class CpuBrain {
       this.push({ input: BTN.ASSIST, frames: 1 }, { input: 0, frames: 4 });
       return;
     }
+    // Heal when hurt and out of reach.
+    const healer = (["sU", "sD"] as MoveSlot[]).find((sl) => moves[sl]?.heal);
+    if (healer && dist > 380 && me.hp < ROSTER[me.char].stats.hp * 0.6 && r() < 0.15) {
+      this.push({ input: specialInput(healer, fwd), frames: 1 }, { input: 0, frames: 60 });
+      return;
+    }
     if (opp.state === "knockdown" || opp.state === "getup") {
       this.push({ input: r() < 0.5 ? fwd : 0, frames: 12 });
       return;
@@ -109,7 +123,11 @@ export class CpuBrain {
     }
     if (dist > 140) {
       const roll = r();
-      if (roll < 0.25 * L.aggression + 0.1) this.push({ input: BTN.UP | fwd, frames: 1 }, { input: fwd, frames: 14 }, { input: BTN.HEAVY, frames: 1 }, { input: 0, frames: 22 });
+      if (roll < 0.25 * L.aggression + 0.1) {
+        // Jump in, then a heavy or the air special.
+        const air = moves.jS && r() < 0.4 ? BTN.SPECIAL : BTN.HEAVY;
+        this.push({ input: BTN.UP | fwd, frames: 1 }, { input: fwd, frames: 14 }, { input: air, frames: 1 }, { input: 0, frames: 26 });
+      } else if (roll < 0.3 && moves.fH) this.push({ input: fwd, frames: 6 }, { input: fwd | BTN.HEAVY, frames: 1 }, { input: 0, frames: 30 });
       else if (roll < 0.45) this.push({ input: fwd, frames: 10 + Math.floor(r() * 16) });
       else if (roll < 0.6 && moves.sN) this.push({ input: BTN.SPECIAL, frames: 1 }, { input: 0, frames: 25 });
       else if (roll < 0.7) this.push({ input: back, frames: 12 });
@@ -122,15 +140,17 @@ export class CpuBrain {
     if (roll < 0.12) {
       this.push({ input: BTN.LIGHT | BTN.HEAVY, frames: 1 }, { input: 0, frames: 30 });
     } else if (roll < 0.12 + 0.5 * L.combo) {
-      const ender = [fwd | BTN.SPECIAL, BTN.DOWN | BTN.SPECIAL, BTN.UP | BTN.SPECIAL][Math.floor(r() * 3)];
-      this.push(
-        { input: BTN.LIGHT, frames: 1 },
-        { input: 0, frames: 8 },
-        { input: BTN.HEAVY, frames: 1 },
-        { input: 0, frames: 9 },
-        { input: ender, frames: 1 },
-        { input: 0, frames: 34 }
-      );
+      const slot = (["sF", "sD", "sU"] as MoveSlot[])[Math.floor(r() * 3)];
+      this.push({ input: BTN.LIGHT, frames: 1 }, { input: 0, frames: 8 }, { input: BTN.HEAVY, frames: 1 }, { input: 0, frames: 9 }, { input: specialInput(slot, fwd), frames: 1 });
+      // Follow the rekka through, pressing Special inside each chain window.
+      let m = moves[slot];
+      for (let depth = 0; m?.chain && depth < 3 && r() < 0.4 + L.combo * 0.6; depth++) {
+        this.push({ input: 0, frames: m.chain.from + 2 }, { input: BTN.SPECIAL, frames: 1 });
+        m = moves[m.chain.to];
+      }
+      this.push({ input: 0, frames: 34 });
+    } else if (roll < 0.55 && moves.fH && r() < 0.35) {
+      this.push({ input: fwd | BTN.HEAVY, frames: 1 }, { input: 0, frames: 30 });
     } else if (roll < 0.75) {
       this.push({ input: BTN.DOWN | BTN.HEAVY, frames: 1 }, { input: BTN.DOWN, frames: 28 });
     } else if (roll < 0.85) {

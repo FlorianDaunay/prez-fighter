@@ -3,7 +3,7 @@ import { GROUND_Y, METER_MAX, SCREEN_H, SCREEN_W, STAGE_W } from "@/core/constan
 import { ROSTER, shortName } from "@/core/roster";
 import { projRect, sim } from "@/core/sim";
 import type { Fighter, GameEvent, GameState, StatusKind, Support } from "@/core/types";
-import { announce, sfx } from "@/audio/engine";
+import { sfx } from "@/audio/engine";
 import { useSettings } from "@/store/settings";
 import { FX_SPRITE, Particles, drawLaptop, drawPanda, drawProjectile, drawScooter, drawWall } from "./fx";
 import { drawSprite } from "./sprites";
@@ -19,7 +19,7 @@ export interface HudInfo {
   training?: boolean;
 }
 
-const STATUS_LABEL: Record<StatusKind, string> = {
+const STATUS_LABEL: Record<StatusKind | "heal", string> = {
   slow: "RALENTI",
   reverse: "COMMANDES INVERSÉES",
   stun: "SONNÉ",
@@ -27,6 +27,8 @@ const STATUS_LABEL: Record<StatusKind, string> = {
   taxed: "TAXÉ +30 %",
   dot: "AFFAIBLI",
   shield: "BOUCLIER",
+  rage: "RAGE +25 %",
+  heal: "SOIN",
 };
 
 export class Renderer {
@@ -143,23 +145,19 @@ export class Renderer {
         this.shake = 20;
         P.add({ kind: "flash", x: e.x, y: e.y, size: 120, color: "#ffffff", life: 14 });
         this.flashMessage("K.O. !", "#ff3b3b", 90);
-        announce("K.O. !");
         break;
       case "round": {
         sfx("round");
         const final = state.fighters[0].rounds === state.config.rounds - 1 && state.fighters[1].rounds === state.config.rounds - 1;
         this.flashMessage(final ? "MANCHE FINALE" : `ROUND ${e.v}`, "#ffd94a", 66);
-        announce(final ? "Manche finale" : `Round ${e.v}`);
         break;
       }
       case "fight":
         sfx("fight");
         this.flashMessage("COMBAT !", "#ff5a2e", 45);
-        announce("Combat !");
         break;
       case "super": {
         sfx("super", pan);
-        if (e.s) announce(e.s);
         break;
       }
       case "support":
@@ -170,7 +168,7 @@ export class Renderer {
         break;
       case "counter":
         sfx("counter", pan);
-        P.add({ kind: "text", text: "CONTRE !", x: e.x, y: e.y + 60, vy: -2, size: 30, color: "#ffd94a", life: 50 });
+        P.add({ kind: "text", text: e.s === "reflect" ? "RENVOI !" : "CONTRE !", x: e.x, y: e.y + 60, vy: -2, size: 30, color: "#ffd94a", life: 50 });
         P.add({ kind: "ring", x: e.x, y: e.y, size: 60, color: "#ffd94a", life: 16 });
         break;
       case "clash":
@@ -186,16 +184,14 @@ export class Renderer {
         break;
       case "timeout":
         this.flashMessage("TEMPS !", "#ffd94a", 90);
-        announce("Temps écoulé !");
         break;
       case "perfect":
         sfx("perfect");
         P.add({ kind: "text", text: "PARFAIT !", x: e.x, y: 260, vy: -0.5, size: 40, color: "#7dff7a", life: 100 });
-        announce("Parfait !");
         break;
       case "status":
         sfx("status", pan);
-        if (e.s) P.add({ kind: "text", text: STATUS_LABEL[e.s as StatusKind] ?? e.s, x: e.x, y: e.y, vy: -1.2, size: 18, color: "#c9a0ff", life: 60 });
+        if (e.s) P.add({ kind: "text", text: STATUS_LABEL[e.s as StatusKind | "heal"] ?? e.s, x: e.x, y: e.y, vy: -1.2, size: 18, color: "#c9a0ff", life: 60 });
         break;
     }
   }
@@ -293,6 +289,7 @@ export class Renderer {
     if ((f.status.reverse ?? 0) > 0) icons.push("swap");
     if ((f.status.taxed ?? 0) > 0) icons.push("dollar");
     if (frozen) icons.push("ice");
+    if ((f.status.rage ?? 0) > 0) icons.push("bang");
     icons.forEach((ic, k) => drawSprite(c, ic, x + (k - (icons.length - 1) / 2) * 26, y - 235 * size, 22));
     if ((f.status.stun ?? 0) > 0) {
       for (let k = 0; k < 3; k++) {
@@ -320,6 +317,15 @@ export class Renderer {
     }
     if (def.look === "pandas") {
       for (let i = 0; i < 3; i++) drawPanda(c, x - s.facing * i * 58, y, this.t + i * 7, s.facing);
+      c.restore();
+      return;
+    }
+    if (def.look.startsWith("@")) {
+      // Animal supports are drawn as sprites, hopping along.
+      for (let i = 0; i < def.members; i++) {
+        const hop = Math.abs(Math.sin((this.t + i * 9) * 0.35)) * 10;
+        drawSprite(c, def.look.slice(1), x - s.facing * i * 62, y - 30 - hop, 66, 0, s.facing < 0);
+      }
       c.restore();
       return;
     }
@@ -521,9 +527,9 @@ export class Renderer {
       c.fillStyle = ready ? char.color : "#333";
       c.fill();
       c.clip();
-      const supImg = sup.look === "scooter" ? null : portrait(sup.look === "pandas" ? "pingpong" : sup.look, 48, left ? 1 : -1);
+      const supImg = sup.look === "scooter" || sup.look.startsWith("@") ? null : portrait(sup.look === "pandas" ? "pingpong" : sup.look, 48, left ? 1 : -1);
       if (supImg) c.drawImage(supImg, ix - 24, iy - 24);
-      else drawSprite(c, "scooter", ix, iy, 28);
+      else drawSprite(c, sup.look.startsWith("@") ? sup.look.slice(1) : "scooter", ix, iy, 28);
       if (sup.look === "pandas") {
         c.fillStyle = char.color;
         c.fillRect(ix - 24, iy - 24, 48, 48);

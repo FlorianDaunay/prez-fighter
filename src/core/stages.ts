@@ -19,6 +19,18 @@ export const STAGES: StageDef[] = [
   { id: "muraille", name: "La Grande Muraille", music: "muraille" },
   { id: "bruxelles", name: "Parlement de Bruxelles", music: "bruxelles" },
   { id: "assemblee", name: "Hémicycle de l'Assemblée", music: "assemblee" },
+  { id: "lehavre", name: "Port du Havre", music: "lehavre" },
+  { id: "matignon", name: "Jardins de Matignon", music: "matignon" },
+  { id: "pau", name: "Château de Pau", music: "pau" },
+  { id: "tiktok", name: "Plateau TikTok", music: "tiktok" },
+  { id: "cannes", name: "Croisette de Cannes", music: "cannes" },
+  { id: "plateau", name: "Plateau du Débat", music: "plateau" },
+  { id: "usine", name: "Usine en Grève", music: "usine" },
+  { id: "pyrenees", name: "Estive des Pyrénées", music: "pyrenees" },
+  { id: "buenosaires", name: "Casa Rosada", music: "buenosaires" },
+  { id: "london", name: "Downing Street", music: "london" },
+  { id: "rome", name: "Le Colisée", music: "rome" },
+  { id: "pyongyang", name: "Grand Défilé de Pyongyang", music: "pyongyang" },
 ];
 
 export const stageIndex = (id: string) => Math.max(0, STAGES.findIndex((s) => s.id === id));
