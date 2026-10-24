@@ -7,6 +7,7 @@ import type { GameState, MoveSlot } from "@/core/types";
 import type { MenuEvent } from "@/input/manager";
 import { Renderer } from "@/render/renderer";
 import { portraitUrl } from "@/render/portraits";
+import { spriteUrl } from "@/render/sprites";
 import { useMenu } from "./useMenu";
 
 // ---------------------------------------------------------------- layout
@@ -94,7 +95,7 @@ export function MenuList({ items, onBack, initial = 0, onFocus }: { items: MenuI
           }}
         >
           <span>
-            {it.icon && <span className="mr-3">{it.icon}</span>}
+            {it.icon && <img src={spriteUrl(it.icon, 64)} alt="" className="inline-block w-8 h-8 mr-3 align-middle" />}
             {it.label}
           </span>
         </div>

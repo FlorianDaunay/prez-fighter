@@ -90,15 +90,15 @@ export function MainMenu() {
             <MenuList
               onBack={() => go("title")}
               items={[
-                { label: "Arcade", icon: "🏆", desc: "Six combats contre l'ordinateur pour conquérir l'Élysée. Les invités étrangers attendent au bout.", onSelect: () => start("arcade") },
-                { label: "Versus local", icon: "🎮", desc: "Deux joueurs sur la même machine (clavier partagé et/ou manettes).", onSelect: () => start("versus") },
-                { label: "Contre l'ordi", icon: "🤖", desc: "Un combat rapide contre l'ordinateur. Difficulté réglable dans les options.", onSelect: () => start("cpu") },
-                { label: "En ligne", icon: "🌐", desc: "Combat en pair-à-pair avec un code de salon. Netcode à rollback : pas de lag d'entrée.", onSelect: () => go("online") },
-                { label: "Entraînement", icon: "🥊", desc: "Vie et jauge infinies, mannequin immobile. Pour réviser ses combos.", onSelect: () => start("training") },
-                { label: "Personnages", icon: "📜", desc: "Le casting, son lore (très) caricatural et la liste des coups avec aperçus animés.", onSelect: () => go("roster") },
-                { label: "Commandes", icon: "🕹️", desc: `Clavier et manettes, tout est remappable. ${pads ? `${pads} manette(s) détectée(s).` : "Aucune manette détectée : appuie sur un bouton de la manette."}`, onSelect: () => go("controls") },
-                { label: "Options", icon: "⚙️", desc: "Son, annonceur, durée des rounds, difficulté, thème.", onSelect: () => go("options") },
-                { label: "Mentions", icon: "ℹ️", desc: "Avertissement, crédits et informations.", onSelect: () => go("credits") },
+                { label: "Arcade", icon: "trophy", desc: "Six combats contre l'ordinateur pour conquérir l'Élysée. Les invités étrangers attendent au bout.", onSelect: () => start("arcade") },
+                { label: "Versus local", icon: "gamepad", desc: "Deux joueurs sur la même machine (clavier partagé et/ou manettes).", onSelect: () => start("versus") },
+                { label: "Contre l'ordi", icon: "robot", desc: "Un combat rapide contre l'ordinateur. Difficulté réglable dans les options.", onSelect: () => start("cpu") },
+                { label: "En ligne", icon: "globe", desc: "Combat en pair-à-pair avec un code de salon. Netcode à rollback : pas de lag d'entrée.", onSelect: () => go("online") },
+                { label: "Entraînement", icon: "glove", desc: "Vie et jauge infinies, mannequin immobile. Pour réviser ses combos.", onSelect: () => start("training") },
+                { label: "Personnages", icon: "scroll", desc: "Le casting, son lore (très) caricatural et la liste des coups avec aperçus animés.", onSelect: () => go("roster") },
+                { label: "Commandes", icon: "joystick", desc: `Clavier et manettes, tout est remappable. ${pads ? `${pads} manette(s) détectée(s).` : "Aucune manette détectée : appuie sur un bouton de la manette."}`, onSelect: () => go("controls") },
+                { label: "Options", icon: "gear", desc: "Son, annonceur, durée des rounds, difficulté, thème.", onSelect: () => go("options") },
+                { label: "Mentions", icon: "info", desc: "Avertissement, crédits et informations.", onSelect: () => go("credits") },
               ]}
             />
           </div>

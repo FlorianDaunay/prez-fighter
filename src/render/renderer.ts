@@ -5,7 +5,8 @@ import { projRect, sim } from "@/core/sim";
 import type { Fighter, GameEvent, GameState, StatusKind, Support } from "@/core/types";
 import { announce, sfx } from "@/audio/engine";
 import { useSettings } from "@/store/settings";
-import { FX_EMOJI, Particles, drawEmoji, drawLaptop, drawPanda, drawProjectile, drawScooter, drawWall } from "./fx";
+import { FX_SPRITE, Particles, drawLaptop, drawPanda, drawProjectile, drawScooter, drawWall } from "./fx";
+import { drawSprite } from "./sprites";
 import { LOOKS } from "./looks";
 import { drawPerson } from "./person";
 import { extension, fighterPose, namedPose } from "./poses";
@@ -79,7 +80,7 @@ export class Renderer {
       const def = ROSTER[f.char].moves[f.move];
       if (!def?.fx) continue;
       if (extension(def, f.moveFrame) > 0.6 && f.moveFrame % 3 === 0) {
-        const e = FX_EMOJI[def.fx];
+        const e = FX_SPRITE[def.fx];
         if (e) {
           const size = ROSTER[f.char].stats.size;
           this.particles.add({
@@ -98,7 +99,7 @@ export class Renderer {
     }
     for (const f of state.fighters) {
       if ((f.status.stun ?? 0) > 0 && state.frame % 10 === 0) {
-        this.particles.add({ kind: "star", text: "⭐", x: f.x + (Math.random() - 0.5) * 50, y: f.y + 200, vy: -1, size: 16, life: 24 });
+        this.particles.add({ kind: "star", text: "star", x: f.x + (Math.random() - 0.5) * 50, y: f.y + 200, vy: -1, size: 16, life: 24 });
       }
     }
   }
@@ -288,15 +289,15 @@ export class Renderer {
     // Status icons above the head
     const size = ROSTER[f.char].stats.size;
     const icons: string[] = [];
-    if ((f.status.slow ?? 0) > 0) icons.push("🐌");
-    if ((f.status.reverse ?? 0) > 0) icons.push("🔀");
-    if ((f.status.taxed ?? 0) > 0) icons.push("💸");
-    if (frozen) icons.push("🧊");
-    icons.forEach((ic, k) => drawEmoji(c, ic, x + (k - (icons.length - 1) / 2) * 26, y - 235 * size, 22));
+    if ((f.status.slow ?? 0) > 0) icons.push("snail");
+    if ((f.status.reverse ?? 0) > 0) icons.push("swap");
+    if ((f.status.taxed ?? 0) > 0) icons.push("dollar");
+    if (frozen) icons.push("ice");
+    icons.forEach((ic, k) => drawSprite(c, ic, x + (k - (icons.length - 1) / 2) * 26, y - 235 * size, 22));
     if ((f.status.stun ?? 0) > 0) {
       for (let k = 0; k < 3; k++) {
         const a = this.t * 0.12 + (k * Math.PI * 2) / 3;
-        drawEmoji(c, "⭐", x + Math.cos(a) * 30, y - 215 * size + Math.sin(a) * 8, 16);
+        drawSprite(c, "star", x + Math.cos(a) * 30, y - 215 * size + Math.sin(a) * 8, 16);
       }
     }
   }
@@ -347,14 +348,14 @@ export class Renderer {
       c.drawImage(this.scratch, x + ox - 220, y - 450);
       if (def.look === "trolls") drawLaptop(c, x + ox + s.facing * 8, y - 75, s.facing);
     }
-    if (def.look === "elon" && !acting) drawEmoji(c, "🚀", x + s.facing * 30, y - 120, 34, s.facing < 0, -0.6);
+    if (def.look === "elon" && !acting) drawSprite(c, "rocket", x + s.facing * 30, y - 120, 34, Math.PI + 0.5 * s.facing);
     if (def.look === "ursula") {
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2 + this.t * 0.05;
-        drawEmoji(c, "⭐", x + Math.cos(a) * 70, y - 120 + Math.sin(a) * 70, 12);
+        drawSprite(c, "star", x + Math.cos(a) * 70, y - 120 + Math.sin(a) * 70, 12);
       }
     }
-    if (def.look === "carla" && !acting) drawEmoji(c, "🎸", x + s.facing * 18, y - 80, 40, s.facing < 0);
+    if (def.look === "carla" && !acting) drawSprite(c, "guitar", x + s.facing * 18, y - 80, 40, 0, s.facing < 0);
     // Name tag
     if (s.age < 50) {
       c.globalAlpha = alpha;
@@ -522,11 +523,11 @@ export class Renderer {
       c.clip();
       const supImg = sup.look === "scooter" ? null : portrait(sup.look === "pandas" ? "pingpong" : sup.look, 48, left ? 1 : -1);
       if (supImg) c.drawImage(supImg, ix - 24, iy - 24);
-      else drawEmoji(c, "🛵", ix, iy, 28);
+      else drawSprite(c, "scooter", ix, iy, 28);
       if (sup.look === "pandas") {
         c.fillStyle = char.color;
         c.fillRect(ix - 24, iy - 24, 48, 48);
-        drawEmoji(c, "🐼", ix, iy, 30);
+        drawSprite(c, "panda", ix, iy, 30);
       }
       if (!ready) {
         c.fillStyle = "rgba(0,0,0,0.6)";

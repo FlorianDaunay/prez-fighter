@@ -1,38 +1,8 @@
 /** Sprites for projectiles, walls, special supports and move effects; plus the particle system. */
 import type { Projectile, Wall } from "@/core/types";
+import { drawSprite } from "./sprites";
 
 type Ctx = CanvasRenderingContext2D;
-
-// ---------------------------------------------------------------- emoji cache
-
-const emojiCache = new Map<string, HTMLCanvasElement>();
-export function emoji(e: string, size: number): HTMLCanvasElement {
-  const key = e + "|" + Math.round(size);
-  let c = emojiCache.get(key);
-  if (!c) {
-    c = document.createElement("canvas");
-    const s = Math.ceil(size * 1.4);
-    c.width = s;
-    c.height = s;
-    const x = c.getContext("2d")!;
-    x.font = `${size}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
-    x.textAlign = "center";
-    x.textBaseline = "middle";
-    x.fillText(e, s / 2, s / 2 + size * 0.05);
-    emojiCache.set(key, c);
-  }
-  return c;
-}
-
-export function drawEmoji(c: Ctx, e: string, x: number, y: number, size: number, flip = false, rot = 0) {
-  const img = emoji(e, size);
-  c.save();
-  c.translate(x, y);
-  if (rot) c.rotate(rot);
-  if (flip) c.scale(-1, 1);
-  c.drawImage(img, -img.width / 2, -img.height / 2);
-  c.restore();
-}
 
 function bubbleText(c: Ctx, s: string, x: number, y: number, w: number, h: number, color: string) {
   c.save();
@@ -63,13 +33,14 @@ export function drawProjectile(c: Ctx, p: Projectile, sx: number, sy: number, t:
     bubbleText(c, s.slice(6), sx, sy, d.w, d.h, d.color ?? "#c8102e");
     return;
   }
-  if (!s.startsWith("#")) {
-    const spin = s === "🍎" || s === "🪙" || s === "🏓" || s === "⌚" || s === "🧰" ? p.age * 0.25 * dir : 0;
-    drawEmoji(c, s, sx, sy, d.size ?? Math.max(d.w, d.h) * 0.95, dir < 0 && s !== "🚀", spin);
-    if (s === "🚀") {
-      c.fillStyle = `rgba(255,${150 + Math.random() * 80},40,0.8)`;
+  if (s.startsWith("@")) {
+    const key = s.slice(1);
+    const spin = key === "apple" || key === "coin" || key === "pingpong" || key === "watch" || key === "toolbox" ? p.age * 0.2 * dir : 0;
+    drawSprite(c, key, sx, sy, d.size ?? Math.max(d.w, d.h) * 0.95, spin, dir < 0 && key !== "rocket");
+    if (key === "rocket") {
+      c.fillStyle = "rgba(255,170,60,0.75)";
       c.beginPath();
-      c.ellipse(sx, sy - d.h * 0.55, 10, 18 + Math.random() * 10, 0, 0, Math.PI * 2);
+      c.ellipse(sx, sy - d.h * 0.55, 9, 20, 0, 0, Math.PI * 2);
       c.fill();
     }
     return;
@@ -153,7 +124,7 @@ export function drawProjectile(c: Ctx, p: Projectile, sx: number, sy: number, t:
       }
       c.fill();
       c.restore();
-      drawEmoji(c, "📸", sx, sy, 30);
+      drawSprite(c, "camera", sx, sy, 30);
       return;
     }
     case "#picket": {
@@ -583,7 +554,7 @@ export class Particles {
           break;
         case "emoji":
         case "star":
-          drawEmoji(c, p.text ?? "⭐", sx, sy, p.size, false, (p.rot ?? 0) + (1 - k) * 3);
+          drawSprite(c, p.text ?? "star", sx, sy, p.size, (p.rot ?? 0) + (1 - k) * 1.5);
           break;
       }
     }
@@ -591,32 +562,44 @@ export class Particles {
   }
 }
 
-/** Emoji emitted around a fighter while a move with this fx key runs. */
-export const FX_EMOJI: Record<string, string> = {
-  sparkle: "✨",
-  maple: "🍁",
-  dragon: "🐉",
-  hearts: "💗",
-  percent: "💲",
-  scissors: "✂️",
-  stars: "⭐",
-  cheese: "🧀",
-  golf: "⛳",
-  bear: "🐻",
-  heels: "👠",
-  polls: "📈",
-  smile: "😁",
-  dust: "💨",
-  flurry: "👊",
-  jelly: "🍮",
-  diamond: "💠",
-  flex: "💪",
-  silk: "🎀",
-  speed: "💨",
-  both: "↔️",
-  lightning: "⚡",
-  podium: "🎤",
-  quake: "💥",
-  shout: "📢",
-  explosion: "💥",
+/** Sprite emitted around a fighter while a move with this fx key runs. */
+export const FX_SPRITE: Record<string, string> = {
+  sparkle: "sparkle",
+  smile: "smile",
+  both: "swap",
+  maple: "leaf",
+  dragon: "dragon",
+  hearts: "heart",
+  percent: "percent",
+  scissors: "scissors",
+  stars: "star",
+  cheese: "cheese",
+  golf: "golf",
+  bear: "bear",
+  heels: "heel",
+  polls: "chart",
+  dust: "puff",
+  flurry: "fist",
+  jelly: "jelly",
+  diamond: "diamond",
+  flex: "muscle",
+  silk: "ribbon",
+  speed: "puff",
+  lightning: "lightning",
+  podium: "mic",
+  quake: "bang",
+  shout: "megaphone",
+  explosion: "bang",
+  chainsaw: "chainsaw",
+  forms: "form",
+  palm: "palm",
+  bicorne: "bicorne",
+  chess: "chess",
+  rose: "rose",
+  mic: "mic",
+  film: "film",
+  seed: "seed",
+  windmill: "windmill",
+  glove: "glove",
+  gull: "gull",
 };

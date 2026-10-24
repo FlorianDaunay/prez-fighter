@@ -107,9 +107,9 @@ export function Online() {
               <MenuList
                 onBack={() => go("menu")}
                 items={[
-                  { label: "Créer un salon", icon: "🏛️", desc: "Tu obtiens un code (et un lien) à envoyer à ton adversaire.", onSelect: host },
-                  { label: "Rejoindre", icon: "🔑", desc: "Entre le code reçu (ou ouvre directement le lien partagé).", onSelect: () => setView("join") },
-                  { label: "Retour", icon: "↩", onSelect: () => go("menu") },
+                  { label: "Créer un salon", icon: "temple", desc: "Tu obtiens un code (et un lien) à envoyer à ton adversaire.", onSelect: host },
+                  { label: "Rejoindre", icon: "key", desc: "Entre le code reçu (ou ouvre directement le lien partagé).", onSelect: () => setView("join") },
+                  { label: "Retour", icon: "back", onSelect: () => go("menu") },
                 ]}
               />
             )}

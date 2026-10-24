@@ -23,7 +23,7 @@ export const ROSTER: CharacterDef[] = [
     stats: stats(4.2, 17.5, 1, 1),
     rating: { power: 3, speed: 4, range: 3, difficulty: 2 },
     moves: {
-      sN: projectileMove("Start-up Nation", "Lance une licorne disruptive. Levée de fonds incluse.", shot("🦄", { vx: 8, hit: hit(70, 22, 16, 5) }), { shout: "Start-up nation !" }),
+      sN: projectileMove("Start-up Nation", "Lance une licorne disruptive. Levée de fonds incluse.", shot("@unicorn", { vx: 8, hit: hit(70, 22, 16, 5) }), { shout: "Start-up nation !" }),
       sF: dashMove("Je traverse la rue", "Traverse l'écran pour vous trouver un emploi. Ou un coup.", { shout: "Je traverse la rue !", fx: "speed", motion: [{ from: 6, to: 24, vx: 11 }] }),
       sD: {
         name: "En même temps",
@@ -59,7 +59,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "walk",
       frames: 70,
       actFrame: 20,
-      projectiles: [shot("📚", { frame: 0, vx: 8, y: 110, hit: hit(40, 20, 14, 3, { status: { kind: "stun", frames: 55 } }) })],
+      projectiles: [shot("@books", { frame: 0, vx: 8, y: 110, hit: hit(40, 20, 14, 3, { status: { kind: "stun", frames: 55 } }) })],
       shout: "Dictée surprise !",
       cooldown: 540,
     },
@@ -132,7 +132,7 @@ export const ROSTER: CharacterDef[] = [
       sN: projectileMove(
         "Smic à 1600",
         "Une liasse de billets en éventail. Trois projectiles redistribués.",
-        shot("💶", { count: 3, spreadVy: [0, 2.4, -1.2], vx: 8.5, w: 38, h: 30, hit: hit(32, 16, 12, 3) }),
+        shot("@banknote", { count: 3, spreadVy: [0, 2.4, -1.2], vx: 8.5, w: 38, h: 30, hit: hit(32, 16, 12, 3) }),
         { shout: "Le Smic à 1600 !" }
       ),
       sF: {
@@ -230,7 +230,7 @@ export const ROSTER: CharacterDef[] = [
         invuln: [0, 26],
         shout: "Bling-bling !",
         projectiles: [
-          { frame: 16, count: 8, interval: 6, origin: "sky", x: -170, y: 520, vx: 0, vy: -15, w: 60, h: 60, life: 60, pierce: true, hit: hit(42, 20, 10, 2, { hitstop: 4 }), sprite: "⌚" },
+          { frame: 16, count: 8, interval: 6, origin: "sky", x: -170, y: 520, vx: 0, vy: -15, w: 60, h: 60, life: 60, pierce: true, hit: hit(42, 20, 10, 2, { hitstop: 4 }), sprite: "@watch" },
         ],
       },
     },
@@ -242,7 +242,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "walk",
       frames: 80,
       actFrame: 20,
-      projectiles: [shot("🎵", { frame: 0, count: 3, interval: 10, vx: 6.5, wave: 30, life: 160, w: 40, h: 40, hit: hit(30, 16, 10, 3) })],
+      projectiles: [shot("@note", { frame: 0, count: 3, interval: 10, vx: 6.5, wave: 30, life: 160, w: 40, h: 40, hit: hit(30, 16, 10, 3) })],
       shout: "Quelqu'un m'a dit…",
       cooldown: 540,
     },
@@ -270,7 +270,7 @@ export const ROSTER: CharacterDef[] = [
       sF: projectileMove(
         "Boîte à Outils",
         "Lance sa boîte à outils en cloche. Retombe en attaque haute.",
-        shot("🧰", { vx: 6, vy: 12, gravity: 0.6, y: 130, hit: hit(90, 24, 16, 6, { overhead: true, knockdown: true }) }),
+        shot("@toolbox", { vx: 6, vy: 12, gravity: 0.6, y: 130, hit: hit(90, 24, 16, 6, { overhead: true, knockdown: true }) }),
         { shout: "J'ai une boîte à outils !" }
       ),
       sD: {
@@ -333,7 +333,7 @@ export const ROSTER: CharacterDef[] = [
       sN: projectileMove(
         "Mangez des Pommes !",
         "Deux pommes lancées en cloche. Cinq fruits et légumes par jour.",
-        shot("🍎", { count: 2, interval: 8, vx: 6.5, vy: 9, gravity: 0.5, spreadVy: [0, 3], y: 130, hit: hit(45, 18, 12, 4) }),
+        shot("@apple", { count: 2, interval: 8, vx: 6.5, vy: 9, gravity: 0.5, spreadVy: [0, 3], y: 130, hit: hit(45, 18, 12, 4) }),
         { shout: "Mangez des pommes !" }
       ),
       sF: dashMove("Charge du Sumo", "Charge de yokozuna en super-armure.", { armor: [3, 20], pose: "sumo", fx: "dust", motion: [{ from: 6, to: 22, vx: 8.5 }] }, { damage: 115 }),
@@ -363,7 +363,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "walk",
       frames: 80,
       actFrame: 18,
-      projectiles: [{ frame: 0, count: 5, interval: 7, origin: "sky", x: -60, y: 520, vx: 0, vy: -12, w: 40, h: 40, life: 60, pierce: true, hit: hit(20, 16, 8, 1), sprite: "🪙" }],
+      projectiles: [{ frame: 0, count: 5, interval: 7, origin: "sky", x: -60, y: 520, vx: 0, vy: -12, w: 40, h: 40, life: 60, pierce: true, hit: hit(20, 16, 8, 1), sprite: "@coin" }],
       shout: "Pièces jaunes !",
       cooldown: 540,
     },
@@ -427,7 +427,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "walk",
       frames: 80,
       actFrame: 20,
-      projectiles: [shot("🥖", { frame: 0, count: 3, interval: 6, vx: 7, vy: 8, gravity: 0.45, spreadVy: [0, 2, 4], hit: hit(30, 16, 10, 3) })],
+      projectiles: [shot("@baguette", { frame: 0, count: 3, interval: 6, vx: 7, vy: 8, gravity: 0.45, spreadVy: [0, 2, 4], hit: hit(30, 16, 10, 3) })],
       shout: "Les camarades !",
       cooldown: 540,
     },
@@ -465,7 +465,7 @@ export const ROSTER: CharacterDef[] = [
         pose: "decree",
         invuln: [0, 28],
         shout: "L'ordre juste !",
-        projectiles: [{ frame: 18, origin: "sky", x: 0, y: 520, vx: 0, vy: -15, w: 150, h: 140, life: 60, hits: 2, pierce: true, hit: hit(150, 40, 14, 6, { knockdown: true, hitstop: 12 }), sprite: "⚖️", size: 120 }],
+        projectiles: [{ frame: 18, origin: "sky", x: 0, y: 520, vx: 0, vy: -15, w: 150, h: 140, life: 60, hits: 2, pierce: true, hit: hit(150, 40, 14, 6, { knockdown: true, hitstop: 12 }), sprite: "@scales", size: 120 }],
       },
     },
     support: {
@@ -476,7 +476,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "walk",
       frames: 80,
       actFrame: 20,
-      projectiles: [shot("💗", { frame: 0, count: 3, interval: 9, vx: 7, wave: 26, life: 150, w: 40, h: 40, hit: hit(30, 16, 10, 3) })],
+      projectiles: [shot("@heart", { frame: 0, count: 3, interval: 9, vx: 7, wave: 26, life: 150, w: 40, h: 40, hit: hit(30, 16, 10, 3) })],
       shout: "Fra-ter-ni-té !",
       cooldown: 540,
     },
@@ -515,7 +515,7 @@ export const ROSTER: CharacterDef[] = [
         invuln: [0, 28],
         shout: "FAKE NEWS !",
         projectiles: [
-          { frame: 16, count: 7, interval: 6, x: 40, y: 120, vx: 9, spreadVy: [0, 1.5, -1.5, 3, -0.5, 2, -2], w: 70, h: 56, life: 120, pierce: true, hit: hit(44, 20, 10, 3, { hitstop: 5 }), sprite: "📰" },
+          { frame: 16, count: 7, interval: 6, x: 40, y: 120, vx: 9, spreadVy: [0, 1.5, -1.5, 3, -0.5, 2, -2], w: 70, h: 56, life: 120, pierce: true, hit: hit(44, 20, 10, 3, { hitstop: 5 }), sprite: "@newspaper" },
         ],
       },
     },
@@ -527,7 +527,7 @@ export const ROSTER: CharacterDef[] = [
       entry: "drop",
       frames: 80,
       actFrame: 18,
-      projectiles: [{ frame: 0, origin: "sky", x: 0, y: 560, vx: 0, vy: -17, w: 60, h: 110, life: 60, pierce: true, hit: hit(100, 28, 16, 6, { knockdown: true, hitstop: 10 }), sprite: "🚀" }],
+      projectiles: [{ frame: 0, origin: "sky", x: 0, y: 560, vx: 0, vy: -17, w: 60, h: 110, life: 60, pierce: true, hit: hit(100, 28, 16, 6, { knockdown: true, hitstop: 10 }), sprite: "@rocket" }],
       shout: "To Mars !",
       cooldown: 540,
     },
@@ -616,7 +616,7 @@ export const ROSTER: CharacterDef[] = [
       sN: projectileMove(
         "Diplomatie du Ping-Pong",
         "Une balle qui rebondit sur le sol. Smash diplomatique.",
-        shot("🏓", { vx: 7.5, vy: 6, gravity: 0.5, bounce: true, life: 160, y: 120, w: 36, h: 36, hits: 2, hit: hit(38, 18, 12, 4) }),
+        shot("@pingpong", { vx: 7.5, vy: 6, gravity: 0.5, bounce: true, life: 160, y: 120, w: 36, h: 36, hits: 2, hit: hit(38, 18, 12, 4) }),
         { shout: "Ping !" }
       ),
       sF: dashMove("Route de la Soie", "Long ruban de soie : la ruée la plus longue du jeu.", { pose: "dash", fx: "silk", motion: [{ from: 6, to: 30, vx: 11 }], frames: 46 }, { damage: 80 }),
@@ -689,7 +689,7 @@ export const ROSTER: CharacterDef[] = [
         pose: "decree",
         invuln: [0, 28],
         shout: "Pünktlich !",
-        projectiles: [{ frame: 20, origin: "screenBack", x: 0, y: 80, vx: 12, w: 220, h: 150, life: 140, hits: 4, pierce: true, hit: hit(72, 24, 12, 4, { hitstop: 7, knockdown: true }), sprite: "🚄", size: 150 }],
+        projectiles: [{ frame: 20, origin: "screenBack", x: 0, y: 80, vx: 12, w: 220, h: 150, life: 140, hits: 4, pierce: true, hit: hit(72, 24, 12, 4, { hitstop: 7, knockdown: true }), sprite: "@train", size: 150 }],
       },
     },
     support: {
